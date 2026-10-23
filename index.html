@@ -341,7 +341,7 @@ input[type=range]{width:100%;accent-color:var(--pink)}
   <div class="lock-card">
     <h1>anı kutusu ♡</h1>
     <p id="lockMessage" class="muted"></p>
-    <label>Şifre</label>
+    <label id="passwordLabel">Şifre</label>
     <input id="lockPassword" type="password">
     <button id="lockButton" class="btn primary full"
             style="margin-top:15px">Devam et</button>
@@ -678,10 +678,6 @@ function getSelected(){
   return design?.pieces.find(p=>p.id===selectedPiece);
 }
 
-/*
-  QR 9%-91% aralığında.
-  Figür merkezleri kenarda tutulur.
-*/
 function safePosition(x,y,size=20){
   x=Math.max(3,Math.min(97,x));
   y=Math.max(3,Math.min(97,y));
@@ -1064,12 +1060,7 @@ async function stickerCanvas(album,size=1000,override=null){
   const ctx=canvas.getContext("2d");
   ctx.scale(size/300,size/300);
 
-  /*
-    Toplam çıkartma: 300 birim = 20 mm
-    QR arka planı: 246 birim = 16.4 mm
-    QR görseli: 240 birim = 16 mm
-  */
-
+  // Çıkartma 20 mm, QR görseli 16 mm.
   ctx.fillStyle="#ffffff";
   ctx.fillRect(27,27,246,246);
 
@@ -1474,7 +1465,7 @@ async function restoreBackup(file){
   }
 }
 
-/* GİRİŞ ŞİFRESİ */
+/* ŞİFRE VE QR ERİŞİM KONTROLÜ */
 
 async function hashPassword(password,salt){
   const data=new TextEncoder().encode(password+salt);
@@ -1488,9 +1479,31 @@ async function setupLock(){
   const msg=$("lockMessage");
   const button=$("lockButton");
   const input=$("lockPassword");
+  const label=$("passwordLabel");
+
+  const qrId=new URLSearchParams(location.search).get("id");
 
   overlay.classList.add("visible");
   input.value="";
+
+  // QR başka cihazda açılmışsa şifre oluşturma ekranı gösterme.
+  if(qrId&&!existing){
+    msg.textContent=
+      "♡ Bu QR yalnızca anıların kaydedildiği cihazda açılabilir.";
+
+    input.style.display="none";
+    label.style.display="none";
+
+    button.textContent="Tamam";
+    button.onclick=()=>{
+      location.href=APP_URL;
+    };
+
+    return;
+  }
+
+  input.style.display="block";
+  label.style.display="block";
 
   if(!existing){
     msg.textContent="Anı kutun için yeni bir şifre oluştur.";
@@ -1498,6 +1511,7 @@ async function setupLock(){
 
     button.onclick=async()=>{
       const password=input.value;
+
       if(password.length<4){
         alert("Şifren en az 4 karakter olsun.");
         return;
@@ -1505,6 +1519,7 @@ async function setupLock(){
 
       const salt=uid();
       const hash=await hashPassword(password,salt);
+
       await setSetting({key:"lock",salt,hash});
       overlay.classList.remove("visible");
       await routeQR();
@@ -1515,6 +1530,7 @@ async function setupLock(){
 
     button.onclick=async()=>{
       const hash=await hashPassword(input.value,existing.salt);
+
       if(hash!==existing.hash){
         alert("Şifre yanlış.");
         return;
