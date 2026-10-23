@@ -1,1270 +1,1424 @@
 
-    
-  
 <!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#fffaf8">
-<title>Anı Kutum ♡</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#faf5f7">
+<title>QR Anı Kutusu ♡</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-:root{
-  --bg:#fffaf8;
-  --paper:#ffffff;
-  --ink:#654f59;
-  --muted:#9c8791;
-  --rose:#b97891;
-  --rose-light:#f7e7ed;
-  --border:#f0e3e7;
-  --shadow:0 8px 25px rgba(135,91,110,.07);
+:root {
+  --bg:#faf6f8;
+  --surface:#fff;
+  --pink:#bd8da4;
+  --pink-light:#f4e6ed;
+  --ink:#574450;
+  --muted:#9c8893;
+  --line:#ecdee5;
+  --danger:#b85d70;
 }
-*{box-sizing:border-box}
-body{
+* {box-sizing:border-box}
+body {
   margin:0;
   background:var(--bg);
   color:var(--ink);
-  font-family:Arial,sans-serif;
+  font-family:system-ui,-apple-system,Arial,sans-serif;
 }
-button,input,select{font:inherit}
-button{
-  border:0;
-  cursor:pointer;
-  border-radius:13px;
-  padding:12px 15px;
-}
-button:disabled{opacity:.5}
-h1,h2,h3{font-family:Georgia,serif;font-weight:normal}
-h1{font-size:29px;line-height:1.2}
-h2{font-size:21px}
-p{line-height:1.5}
-small,.muted{color:var(--muted)}
-main{
-  max-width:540px;
-  margin:auto;
-  padding:20px 18px 105px;
-}
-.topbar{
+button,input,select {font:inherit}
+button {cursor:pointer}
+button:disabled {opacity:.45;cursor:not-allowed}
+header {
+  position:sticky;
+  top:0;
+  z-index:10;
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  margin-bottom:20px;
-}
-.brand{
-  font:26px Georgia,serif;
-  color:var(--rose);
-}
-.row{
-  display:flex;
   justify-content:space-between;
-  align-items:center;
-  gap:10px;
+  padding:13px 17px;
+  background:#faf6f8ee;
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
 }
-.stack{display:grid;gap:10px}
-.primary{
-  background:var(--rose);
-  color:white;
-}
-.soft{
-  background:var(--rose-light);
-  color:var(--ink);
-}
-.ghost{
-  background:white;
-  border:1px solid var(--border);
-  color:var(--ink);
-}
-.danger{
-  background:#fde7e8;
-  color:#a44759;
-}
-.card{
-  background:var(--paper);
-  border:1px solid var(--border);
-  border-radius:20px;
-  padding:18px;
-  margin:15px 0;
-  box-shadow:var(--shadow);
-}
-.hero{
-  background:linear-gradient(135deg,#fae8ed,#fff5e9);
-  padding:25px;
-  border-radius:24px;
-  margin:20px 0;
-}
-.hero h1{margin:0 0 8px}
-.hero p{margin:0 0 20px}
-input{
-  width:100%;
-  background:white;
-  border:1px solid #e8d9df;
-  border-radius:12px;
-  padding:13px;
-  margin:7px 0 15px;
-  color:var(--ink);
-}
-.screen{display:none}
-.screen.active{display:block}
-.album-list{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:13px;
-}
-.album-card{
-  background:white;
-  border:1px solid var(--border);
+.logo {font:26px Georgia,serif}
+.logo span {color:var(--pink)}
+main {max-width:780px;margin:auto;padding:18px}
+h1 {font:32px Georgia,serif;margin:12px 0}
+h2 {font:23px Georgia,serif;margin:0 0 12px}
+p {line-height:1.55}
+small,.muted {color:var(--muted)}
+.card {
+  background:var(--surface);
+  border:1px solid var(--line);
   border-radius:18px;
-  padding:9px;
-  text-align:left;
-  box-shadow:var(--shadow);
-  min-width:0;
+  padding:17px;
+  margin-bottom:14px;
 }
-.album-cover{
-  aspect-ratio:1;
-  background:#f7edf0;
+.btn {
+  padding:11px 14px;
+  background:#fff;
+  color:var(--ink);
+  border:1px solid var(--line);
   border-radius:12px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  font:32px Georgia,serif;
-  color:#c79eaf;
 }
-.album-cover img{
+.btn.primary {background:var(--pink);color:#fff;border-color:var(--pink)}
+.btn.danger {color:var(--danger)}
+.btn.active {background:var(--pink-light);border-color:var(--pink)}
+.row {display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.between {justify-content:space-between}
+.full {width:100%}
+.screen {display:none}
+.screen.show {display:block}
+label {display:block;font-size:13px;margin:13px 0 6px}
+input[type=text],
+input[type=date],
+input[type=password],
+input[type=number],
+select {
   width:100%;
-  height:100%;
-  object-fit:cover;
-}
-.album-info{padding:9px 5px 4px}
-.album-info strong{
-  display:block;
-  overflow-wrap:anywhere;
-  margin-bottom:5px;
-}
-.album-info small{font-size:12px}
-.uploads{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:9px;
-  margin:18px 0;
-}
-.uploads label{
-  background:#f8edf1;
-  padding:16px 5px;
-  text-align:center;
-  border-radius:14px;
-  font-size:13px;
-  cursor:pointer;
-}
-.uploads label span{
-  display:block;
-  font-size:23px;
-  margin-bottom:8px;
-}
-.uploads input{display:none}
-.media-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:10px;
-}
-.media{
-  background:#fff4f6;
-  border-radius:12px;
-  padding:5px;
-  overflow:hidden;
-  position:relative;
-}
-.media img,.media video{
-  display:block;
-  width:100%;
-  height:165px;
-  object-fit:cover;
-  border-radius:9px;
-}
-.media.audio{
-  grid-column:1/-1;
-  padding:13px;
-}
-.media audio{width:100%}
-.media .delete{
-  position:absolute;
-  top:8px;
-  right:8px;
-  padding:5px 10px;
+  padding:12px;
+  color:var(--ink);
   background:white;
-  color:#a44e69;
+  border:1px solid var(--line);
+  border-radius:11px;
 }
-.section-heading{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin:25px 0 12px;
+input[type=range] {width:100%;accent-color:var(--pink)}
+.album-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:12px;
 }
-.section-heading h2{margin:0}
-.empty{
-  text-align:center;
-  padding:24px 12px;
-  color:var(--muted);
-}
-.notice{
-  background:#fff3e8;
-  border-radius:12px;
-  padding:13px;
-  font-size:13px;
-  line-height:1.5;
-}
-nav{
-  position:fixed;
-  bottom:0;
-  left:50%;
-  transform:translateX(-50%);
+.album-tile {
+  display:block;
   width:100%;
-  max-width:540px;
-  background:#fffdfc;
-  border-top:1px solid var(--border);
-  display:flex;
-  justify-content:space-around;
-  padding:10px 8px;
-  z-index:20;
+  padding:17px;
+  text-align:left;
+  background:white;
+  border:1px solid var(--line);
+  border-radius:15px;
+  color:var(--ink);
 }
-nav button{
-  background:transparent;
-  color:var(--rose);
+.album-tile .emoji {font-size:29px;margin-bottom:12px}
+.album-tile strong {display:block;overflow-wrap:anywhere}
+.album-tile small {display:block;margin-top:8px}
+.media-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.media-card {
+  position:relative;
+  overflow:hidden;
+  border-radius:13px;
+  background:#f1e8ed;
+  min-height:70px;
+}
+.media-card img,.media-card video {width:100%;display:block}
+.media-card audio {width:100%;margin-top:35px}
+.media-card .delete-media {position:absolute;right:6px;top:6px}
+.selection-list {display:grid;gap:8px}
+.selection-item {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fdfafb;
+}
+.selection-item input {width:18px;height:18px;accent-color:var(--pink)}
+.selection-item span {flex:1;overflow-wrap:anywhere}
+.studio-shell {
+  background:#f0e8ec;
+  border-radius:18px;
+  padding:16px 10px;
+  margin:14px 0;
+}
+.studio-board {
+  width:300px;
+  height:300px;
+  max-width:100%;
+  aspect-ratio:1;
+  position:relative;
+  margin:auto;
+  touch-action:none;
+}
+.studio-qr {
+  position:absolute;
+  left:14%;
+  top:14%;
+  width:72%;
+  height:72%;
+  background:#fff;
+  padding:5px;
+  pointer-events:none;
+}
+.studio-qr img,.studio-qr canvas {
+  width:100%!important;
+  height:100%!important;
+  display:block;
+}
+.studio-piece {
+  position:absolute;
+  transform:translate(-50%,-50%);
+  user-select:none;
+  touch-action:none;
+  cursor:grab;
+  line-height:1;
+}
+.studio-piece.selected {
+  outline:1px dashed var(--pink);
+  outline-offset:5px;
+}
+.tabs {display:flex;gap:7px;overflow-x:auto;padding-bottom:10px}
+.tab {
+  white-space:nowrap;
+  background:#fff;
+  border:1px solid var(--line);
+  padding:10px 12px;
+  border-radius:11px;
   font-size:13px;
 }
-#lockOverlay{
+.tab.active {background:var(--pink-light);border-color:var(--pink)}
+.studio-panel {
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:16px;
+}
+.symbol-grid {display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
+.symbol {
+  min-height:48px;
+  font-size:25px;
+  background:#fdfafb;
+  color:#ad7f95;
+  border:1px solid var(--line);
+  border-radius:10px;
+}
+.palette {display:flex;flex-wrap:wrap;gap:11px;margin:12px 0}
+.swatch {
+  width:36px;height:36px;
+  border-radius:50%;
+  border:3px solid white;
+  box-shadow:0 0 0 1px #d8cbd1;
+}
+.swatch.active {box-shadow:0 0 0 2px #614a57}
+.preview {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
+.preview img {width:240px;height:240px;object-fit:contain}
+#lockOverlay {
   position:fixed;
   inset:0;
   z-index:100;
   display:none;
-  justify-content:center;
   align-items:center;
-  background:#fff9f8;
+  justify-content:center;
   padding:20px;
+  background:var(--bg);
 }
-#lockOverlay.visible{display:flex}
-#lockOverlay .card{
+#lockOverlay.visible {display:flex}
+.lock-card {
   width:100%;
-  max-width:380px;
-}
-
-/* QR TASARIMLARI */
-
-.style-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:11px;
-}
-.style-option{
+  max-width:360px;
   background:white;
-  border:2px solid var(--border);
-  border-radius:15px;
-  padding:13px 8px;
-  text-align:center;
-  color:var(--ink);
-}
-.style-option.selected{
-  border-color:var(--rose);
-  background:#fff5f8;
-}
-.style-swatch{
-  display:block;
-  width:46px;
-  height:46px;
-  margin:0 auto 10px;
-  background:white;
-  border:3px solid var(--swatch);
-}
-.style-swatch.double{border-style:double;border-width:5px}
-.style-swatch.dashed{border-style:dashed}
-.style-swatch.dotted{border-style:dotted}
-.style-swatch.rounded{border-radius:10px}
-.style-swatch.soft{border-radius:5px;background:#fff8fa}
-.style-swatch.corner{border-color:transparent;position:relative}
-.style-swatch.corner:before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border:3px solid var(--swatch);
-  clip-path:polygon(
-    0 0,35% 0,35% 8%,8% 8%,
-    8% 35%,0 35%,
-    0 0,
-    65% 0,100% 0,100% 35%,
-    92% 35%,92% 8%,65% 8%,
-    65% 0,
-    100% 65%,100% 100%,65% 100%,
-    65% 92%,92% 92%,92% 65%,
-    100% 65%,
-    35% 100%,0 100%,0 65%,
-    8% 65%,8% 92%,35% 92%
-  );
-}
-.style-swatch.none{border:0}
-.style-option small{
-  display:block;
-  color:var(--muted);
-  margin-top:4px;
-}
-
-/* 20 x 20 mm: ÇERÇEVE DAHİL */
-.sticker{
-  --frame:#b97891;
-  width:20mm;
-  height:20mm;
-  flex:none;
-  position:relative;
-  background:white;
-  overflow:hidden;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  border-radius:0;
-  print-color-adjust:exact;
-  -webkit-print-color-adjust:exact;
-}
-.sticker .frame{
-  position:absolute;
-  inset:.3mm;
-  pointer-events:none;
-  border:.3mm solid var(--frame);
-}
-.sticker.double .frame{
-  border:.7mm double var(--frame);
-}
-.sticker.dashed .frame{
-  border:.3mm dashed var(--frame);
-}
-.sticker.dotted .frame{
-  border:.35mm dotted var(--frame);
-}
-.sticker.rounded .frame{
-  border-radius:2mm;
-}
-.sticker.soft .frame{
-  border-radius:.8mm;
-}
-.sticker.corner .frame{
-  border:none;
-  background:
-    linear-gradient(var(--frame),var(--frame)) left top/4mm .35mm no-repeat,
-    linear-gradient(var(--frame),var(--frame)) left top/.35mm 4mm no-repeat,
-    linear-gradient(var(--frame),var(--frame)) right top/4mm .35mm no-repeat,
-    linear-gradient(var(--frame),var(--frame)) right top/.35mm 4mm no-repeat,
-    linear-gradient(var(--frame),var(--frame)) left bottom/4mm .35mm no-repeat,
-    linear-gradient(var(--frame),var(--frame)) left bottom/.35mm 4mm no-repeat,
-    linear-gradient(var(--frame),var(--frame)) right bottom/4mm .35mm no-repeat,
-    linear-gradient(var(--frame),var(--frame)) right bottom/.35mm 4mm no-repeat;
-}
-.sticker.none .frame{display:none}
-.sticker .qr{
-  position:relative;
-  z-index:1;
-  width:17.2mm;
-  height:17.2mm;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:white;
-}
-.sticker .qr img,
-.sticker .qr canvas{
-  width:100%!important;
-  height:100%!important;
-  image-rendering:pixelated;
-}
-.sticker .qr svg{
-  width:100%;
-  height:100%;
-}
-.sticker .qr svg rect{
-  shape-rendering:crispEdges;
-}
-.qr-preview{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:230px;
-  background:white;
-  border:1px solid var(--border);
+  padding:24px;
+  border:1px solid var(--line);
   border-radius:20px;
-  margin:20px 0;
-  overflow:hidden;
 }
-.qr-preview .sticker{
-  transform:scale(2.5);
-}
-#printGrid{
-  display:grid;
-  grid-template-columns:repeat(7,20mm);
-  gap:5mm;
-  justify-content:center;
-  padding:10mm 0;
-  background:white;
-}
-@media(max-width:380px){
-  .album-list{gap:9px}
-  #printGrid{transform-origin:top left}
-}
-@media print{
-  @page{size:A4;margin:10mm}
-  body{background:white}
-  main{
-    max-width:none;
-    margin:0;
-    padding:0;
-  }
-  header,nav,.no-print{display:none!important}
-  .screen{display:none!important}
-  #printScreen{display:block!important}
-  #printGrid{
-    grid-template-columns:repeat(7,20mm);
-    gap:5mm;
-    justify-content:start;
-    padding:0;
-    transform:none!important;
-  }
+@media(max-width:480px) {
+  .studio-board {width:270px;height:270px}
+  .symbol-grid {grid-template-columns:repeat(5,1fr)}
+  .media-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 </style>
 </head>
 
 <body>
 
-<div id="lockOverlay">
-  <div class="card">
-    <h1>Anı Kutum ♡</h1>
-    <p class="muted">Anılarını görmek için şifreni gir.</p>
-    <input id="unlockPassword" type="password"
-           placeholder="Şifren">
-    <button class="primary" onclick="unlock()">Kilidi aç</button>
-    <p id="lockMessage" class="muted"></p>
-  </div>
-</div>
+<header>
+  <div class="logo">anı kutusu <span>♡</span></div>
+  <button class="btn" onclick="show('home')">⌂ Albümler</button>
+</header>
 
 <main>
 
-<header class="topbar">
-  <div class="brand">anı kutum ♡</div>
-  <span style="color:#c9a2b1">✿</span>
-</header>
-
 <!-- ANA SAYFA -->
-<section id="home" class="screen active">
-
-  <div class="hero">
-    <h1>Küçük anılar, güzel hatıralar.</h1>
-    <p class="muted">Fotoğrafların için sana özel bir yer.</p>
-    <button class="primary" onclick="newAlbum()">
-      + Yeni albüm
-    </button>
+<section id="home" class="screen show">
+  <div class="row between">
+    <div>
+      <h1>Anılarım ♡</h1>
+      <small>Defterine sakladığın küçük dünyalar</small>
+    </div>
+    <button class="btn primary" onclick="newAlbum()">+ Albüm</button>
   </div>
 
-  <div class="section-heading">
-    <h2>Albümlerim</h2>
-    <button class="soft" onclick="openPrint()">QR sayfam</button>
-  </div>
+  <div style="height:18px"></div>
+  <div id="albumList" class="album-grid"></div>
 
-  <div id="albumList" class="album-list"></div>
-
-  <div class="card">
-    <h2>Anılarımı koru ♡</h2>
+  <div class="card" style="margin-top:18px">
+    <h2>QR Baskı Merkezi</h2>
     <p class="muted">
-      Telefon değiştirirken anılarını şifreli yedekten
-      geri yükleyebilirsin.
+      Albümlerinin QR çıkartmalarını A4 PDF olarak hazırla.
+      Her çıkartma 2 × 2 cm.
     </p>
-
-    <div class="stack">
-      <button class="soft" onclick="backup()">
-        Şifreli yedek oluştur
+    <div class="row">
+      <button class="btn primary" onclick="openSelection()">
+        ☑ QR'ları seç
       </button>
-
-      <button class="ghost"
-        onclick="document.getElementById('restoreFile').click()">
-        Yedeği geri yükle
+      <button class="btn" onclick="exportAllPDF()">
+        ↓ Tüm QR'ları A4 PDF indir
       </button>
-
-      <input id="restoreFile" type="file"
-        accept=".json,application/json"
-        style="display:none"
-        onchange="restoreBackup(this)">
     </div>
   </div>
 
+  <div class="card">
+    <h2>Yedekleme</h2>
+    <p class="muted">
+      Anıların bu tarayıcıda saklanır. Başka telefona geçmeden
+      önce şifreli yedek indir.
+    </p>
+    <div class="row">
+      <button class="btn" onclick="backup()">↓ Şifreli yedek al</button>
+      <button class="btn" onclick="$('restoreFile').click()">
+        ↑ Yedek yükle
+      </button>
+      <input id="restoreFile" type="file"
+             accept=".json,application/json" hidden
+             onchange="restoreBackup(this.files[0]);this.value=''">
+    </div>
+  </div>
 </section>
 
 <!-- YENİ ALBÜM -->
 <section id="createScreen" class="screen">
-  <button class="ghost" onclick="show('home')">← Geri</button>
-  <h1>Yeni albüm ♡</h1>
-
-  <label>Albüm adı</label>
-  <input id="albumTitle" placeholder="Bir günün hatırası">
-
-  <label>Tarih</label>
-  <input id="albumDate" type="date">
-
-  <button class="primary" onclick="createAlbum()">
-    Albümü oluştur
-  </button>
+  <button class="btn" onclick="show('home')">← Geri</button>
+  <div class="card" style="margin-top:15px">
+    <h2>Yeni anı albümü</h2>
+    <label>Albüm adı</label>
+    <input id="albumTitle" type="text" placeholder="Örneğin: Ekim anıları">
+    <label>Tarih</label>
+    <input id="albumDate" type="date">
+    <button class="btn primary full" style="margin-top:16px"
+            onclick="createAlbum()">Albümü oluştur</button>
+  </div>
 </section>
 
 <!-- ALBÜM -->
 <section id="albumScreen" class="screen">
-  <button class="ghost" onclick="show('home')">← Albümler</button>
-
-  <h1 id="currentTitle"></h1>
-  <p id="currentDate" class="muted"></p>
-
-  <div class="row">
-    <button class="soft" onclick="openQR()">
-      QR çıkartmam
-    </button>
-    <button class="danger" onclick="deleteAlbum()">
-      Albümü sil
-    </button>
+  <button class="btn" onclick="show('home')">← Albümler</button>
+  <div class="card" style="margin-top:15px">
+    <h1 id="openAlbumTitle"></h1>
+    <small id="openAlbumDate"></small>
+    <div class="row" style="margin-top:17px">
+      <button class="btn primary" onclick="$('mediaInput').click()">
+        + Fotoğraf / video / ses
+      </button>
+      <button class="btn" onclick="openStudio()">✿ QR tasarla</button>
+      <button class="btn" onclick="exportCurrentPDF()">
+        ↓ Bu QR'ı A4 PDF indir
+      </button>
+      <button class="btn danger" onclick="deleteAlbum()">Albümü sil</button>
+    </div>
+    <input id="mediaInput" type="file" multiple
+           accept="image/*,video/*,audio/*" hidden
+           onchange="upload(this.files);this.value=''">
   </div>
-
-  <div class="uploads">
-    <label>
-      <span>▧</span>Fotoğraf
-      <input type="file" accept="image/*" multiple
-        onchange="upload(this,'image')">
-    </label>
-
-    <label>
-      <span>♫</span>Ses
-      <input type="file" accept="audio/*" multiple
-        onchange="upload(this,'audio')">
-    </label>
-
-    <label>
-      <span>▣</span>Video
-      <input type="file" accept="video/*" multiple
-        onchange="upload(this,'video')">
-    </label>
-  </div>
-
-  <div class="section-heading"><h2>Fotoğraflar</h2></div>
-  <div id="images" class="media-grid"></div>
-
-  <div class="section-heading"><h2>Ses kayıtları</h2></div>
-  <div id="audios" class="media-grid"></div>
-
-  <div class="section-heading"><h2>Videolar</h2></div>
-  <div id="videos" class="media-grid"></div>
+  <div id="mediaList" class="media-grid"></div>
 </section>
 
-<!-- QR TASARIM -->
-<section id="qrScreen" class="screen">
-  <button class="ghost" onclick="show('albumScreen')">
-    ← Albüme dön
-  </button>
-
-  <h1>QR çıkartmam ♡</h1>
-  <p class="muted">
-    Yazısız, sade ve kolay kesilebilir.
-    Çerçeve dâhil 2 × 2 cm.
-  </p>
-
-  <h2>Çerçeve seç</h2>
-  <div id="styleGrid" class="style-grid"></div>
-
-  <div class="qr-preview">
-    <div id="qrPreview"></div>
+<!-- QR TASARIM ATÖLYESİ -->
+<section id="studioScreen" class="screen">
+  <div class="row between">
+    <button class="btn" onclick="openAlbum(currentAlbumId)">← Albüme dön</button>
+    <div class="row">
+      <button class="btn" onclick="undoDesign()">↶ Geri al</button>
+      <button class="btn danger" onclick="removeSelected()">🗑 Sil</button>
+    </div>
   </div>
 
-  <p class="muted">
-    Önizleme büyütülmüştür. Baskıda gerçek ölçü 2 × 2 cm'dir.
-  </p>
+  <h1>anı atölyesi ✿</h1>
+  <p class="muted">Süslemeleri seç, sürükle ve ayrı ayrı renklendir.</p>
 
-  <button class="primary" onclick="downloadQR()">
-    QR görselini indir
-  </button>
-</section>
+  <div class="studio-shell">
+    <div class="row between"
+         style="font-size:11px;color:#9c8893;margin:0 8px 13px">
+      <span>ŞEFFAF TASARIM ALANI</span>
+      <span>20 × 20 mm</span>
+    </div>
 
-<!-- YAZDIRMA -->
-<section id="printScreen" class="screen">
+    <div id="studioBoard" class="studio-board">
+      <svg id="studioFrame" viewBox="0 0 300 300"
+           style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+      </svg>
+      <div id="studioQR" class="studio-qr"></div>
+      <div id="studioPieces" style="position:absolute;inset:0"></div>
+    </div>
 
-  <div class="no-print">
-    <button class="ghost" onclick="show('home')">← Geri</button>
-    <h1>QR çıkartma sayfam ♡</h1>
-    <p class="muted">
-      A4 kâğıt, %100 ölçek. Her etiket 20 × 20 mm.
+    <p class="muted" style="font-size:11px;text-align:center;margin:15px 0 0">
+      QR ortada kalır · Süslemeler kenarlarda hareket eder
     </p>
-    <button class="primary" onclick="window.print()">
-      Yazdır
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="decor" onclick="setStudioTab('decor')">
+      ✿ Süslemeler
+    </button>
+    <button class="tab" data-tab="color" onclick="setStudioTab('color')">
+      ◉ Renkler
+    </button>
+    <button class="tab" data-tab="edit" onclick="setStudioTab('edit')">
+      ⚙ Düzenle
+    </button>
+    <button class="tab" data-tab="frame" onclick="setStudioTab('frame')">
+      ▢ Çerçeve
     </button>
   </div>
 
-  <div id="printGrid"></div>
+  <div id="studioPanel" class="studio-panel"></div>
 
+  <div class="row" style="margin-top:14px">
+    <button class="btn primary" onclick="saveDesign()">
+      ✓ Tasarımı kaydet
+    </button>
+    <button class="btn" onclick="openQR()">QR önizlemesi</button>
+  </div>
 </section>
 
-<nav class="no-print">
-  <button onclick="show('home')">Albümler</button>
-  <button onclick="newAlbum()">+ Yeni</button>
-  <button onclick="backup()">Yedek</button>
-</nav>
+<!-- QR ÖNİZLEME -->
+<section id="qrScreen" class="screen">
+  <button class="btn" onclick="openStudio()">← Tasarıma dön</button>
+  <h1>QR çıkartman ♡</h1>
+  <p class="muted">Baskıda tamamı 2 × 2 cm olacak.</p>
+  <div id="qrPreview" class="preview"></div>
+  <div class="row">
+    <button class="btn primary" onclick="downloadQR()">↓ PNG indir</button>
+    <button class="btn" onclick="exportCurrentPDF()">↓ A4 PDF indir</button>
+    <button class="btn" onclick="openSelection()">☑ QR seçimi</button>
+  </div>
+</section>
+
+<!-- QR SEÇİMİ -->
+<section id="selectionScreen" class="screen">
+  <button class="btn" onclick="show('home')">← Albümler</button>
+  <h1>QR Baskı Merkezi ♡</h1>
+  <p class="muted">
+    A4 PDF'ye eklemek istediğin albümleri işaretle.
+  </p>
+
+  <div class="card">
+    <div class="row between" style="margin-bottom:15px">
+      <strong id="selectionCount">0 albüm seçildi</strong>
+      <button class="btn" onclick="toggleAllSelections()">Tümünü seç</button>
+    </div>
+
+    <div id="selectionList" class="selection-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="row between">
+      <span>Sayfa boyutu</span><strong>A4</strong>
+    </div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:13px 0">
+    <div class="row between">
+      <span>Çıkartma boyutu</span><strong>20 × 20 mm</strong>
+    </div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:13px 0">
+    <div class="row between">
+      <span>Bir sayfadaki kapasite</span><strong>70 QR</strong>
+    </div>
+    <button id="selectedPDFButton" class="btn primary full"
+            style="margin-top:18px"
+            onclick="exportSelectedPDF()">
+      ↓ Seçili QR'ları A4 PDF indir
+    </button>
+  </div>
+</section>
 
 </main>
 
-<script>
-/*
-  SABİT ADRES
-  GitHub Pages adresini değiştirme.
-  Böylece eski QR bağlantıları aynı kalır.
-*/
-const APP_URL="https://ayfer123.github.io/ani-kutusu/";
+<!-- ŞİFRE -->
+<div id="lockOverlay">
+  <div class="lock-card">
+    <h1>anı kutusu ♡</h1>
+    <p id="lockMessage" class="muted"></p>
+    <label>Şifre</label>
+    <input id="lockPassword" type="password">
+    <button id="lockButton" class="btn primary full"
+            style="margin-top:15px">Devam et</button>
+  </div>
+</div>
 
-/*
-  ESKİ VERİTABANIYLA UYUMLU
-*/
+<script>
+"use strict";
+
+const APP_URL="https://ayfer123.github.io/ani-kutusu/";
 const DB_NAME="qrAniKutusuDB";
-const STORE="albums";
-const META="settings";
+const $=id=>document.getElementById(id);
+const uid=()=>crypto.randomUUID();
 
 let db;
-let active=null;
-let urls=[];
-let unlocked=false;
+let currentAlbumId=null;
+let currentAlbum=null;
+let objectUrls=[];
+let design=null;
+let selectedPiece=null;
+let studioTab="decor";
+let history=[];
+let selectionIds=new Set();
+let selectionAlbums=[];
+let qrCache=new Map();
 
-/* ÇERÇEVE KOLEKSİYONU */
-
-const STYLES=[
-  {
-    id:"floral",
-    name:"İnce pembe",
-    css:"line",
-    color:"#c58fa6"
-  },
-  {
-    id:"vintage",
-    name:"Çift çizgi",
-    css:"double",
-    color:"#b99c80"
-  },
-  {
-    id:"botanical",
-    name:"Yeşil çizgi",
-    css:"line",
-    color:"#88a58d"
-  },
-  {
-    id:"pink",
-    name:"Yuvarlak pembe",
-    css:"rounded",
-    color:"#c58fa6"
-  },
-  {
-    id:"rose-dashed",
-    name:"Kesik pembe",
-    css:"dashed",
-    color:"#bc8398"
-  },
-  {
-    id:"blue-corner",
-    name:"Mavi köşeler",
-    css:"corner",
-    color:"#7c9fba"
-  },
-  {
-    id:"sage-dotted",
-    name:"Noktalı yeşil",
-    css:"dotted",
-    color:"#88a58d"
-  },
-  {
-    id:"lavender",
-    name:"Lila çerçeve",
-    css:"soft",
-    color:"#a899c8"
-  },
-  {
-    id:"peach-double",
-    name:"Şeftali çift çizgi",
-    css:"double",
-    color:"#d5a183"
-  },
-  {
-    id:"minimal",
-    name:"Çerçevesiz",
-    css:"none",
-    color:"#ffffff"
-  }
+const PALETTE=[
+  "#d79bab","#b58ac5","#8ea88d","#9ab9d4",
+  "#d2ad70","#d28f79","#47414a","#ffffff",
+  "#e2b5cf","#779d9a","#c9b6e2","#a9a9a9",
+  "#e6cfb5","#222222"
 ];
 
-function styleOf(id){
-  return STYLES.find(s=>s.id===id)||STYLES[0];
-}
-
-/* INDEXEDDB */
-
-function openDB(){
-  return new Promise((resolve,reject)=>{
-    const request=indexedDB.open(DB_NAME,2);
-
-    request.onupgradeneeded=()=>{
-      const d=request.result;
-
-      if(!d.objectStoreNames.contains(STORE)){
-        d.createObjectStore(STORE,{keyPath:"id"});
-      }
-
-      if(!d.objectStoreNames.contains(META)){
-        d.createObjectStore(META,{keyPath:"key"});
-      }
-    };
-
-    request.onsuccess=()=>resolve(request.result);
-    request.onerror=()=>reject(request.error);
-  });
-}
-
-function operation(name,mode,method,value){
-  return new Promise((resolve,reject)=>{
-    const tx=db.transaction(name,mode);
-    const request=tx.objectStore(name)[method](value);
-    request.onsuccess=()=>resolve(request.result);
-    request.onerror=()=>reject(request.error);
-  });
-}
-
-const allAlbums=()=>operation(STORE,"readonly","getAll");
-const getAlbum=id=>operation(STORE,"readonly","get",id);
-const saveAlbum=a=>operation(STORE,"readwrite","put",a);
-const eraseAlbum=id=>operation(STORE,"readwrite","delete",id);
-const getSetting=key=>operation(META,"readonly","get",key);
-const setSetting=obj=>operation(META,"readwrite","put",obj);
-
-/* EKRANLAR */
+const DECORATIONS={
+  "Çiçekler":["✿","❀","❁","✾","✽","✼"],
+  "Yıldızlar":["✦","✧","✶","✳","⋆","✺"],
+  "Kalpler":["♡","♥","❥","ღ","❦","❧"],
+  "Doğa":["☘","♧","❃","☼","☾","❋"],
+  "Detaylar":["⌁","✣","✤","✥","❈","✢"]
+};
 
 function show(id){
-  document.querySelectorAll(".screen").forEach(s=>{
-    s.classList.toggle("active",s.id===id);
-  });
-
+  document.querySelectorAll(".screen")
+    .forEach(e=>e.classList.remove("show"));
+  $(id).classList.add("show");
   window.scrollTo(0,0);
-
   if(id==="home")renderAlbums();
 }
 
+function openDB(){
+  return new Promise((resolve,reject)=>{
+    const r=indexedDB.open(DB_NAME,2);
+    r.onupgradeneeded=()=>{
+      const d=r.result;
+      if(!d.objectStoreNames.contains("albums"))
+        d.createObjectStore("albums",{keyPath:"id"});
+      if(!d.objectStoreNames.contains("settings"))
+        d.createObjectStore("settings",{keyPath:"key"});
+    };
+    r.onsuccess=()=>resolve(r.result);
+    r.onerror=()=>reject(r.error);
+  });
+}
+
+function operation(store,mode,fn){
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(store,mode);
+    const req=fn(tx.objectStore(store));
+    tx.oncomplete=()=>resolve(req?.result);
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+
+const allAlbums=()=>operation("albums","readonly",s=>s.getAll());
+const getAlbum=id=>operation("albums","readonly",s=>s.get(id));
+const saveAlbum=a=>operation("albums","readwrite",s=>s.put(a));
+const eraseAlbum=id=>operation("albums","readwrite",s=>s.delete(id));
+const getSetting=k=>operation("settings","readonly",s=>s.get(k));
+const setSetting=v=>operation("settings","readwrite",s=>s.put(v));
+
+function defaultDesign(){
+  return {
+    frame:"solid",
+    frameColor:"#d79bab",
+    frameWidth:0.05,
+    pieces:[]
+  };
+}
+
+function normalizeDesign(value){
+  if(!value||typeof value!=="object")return defaultDesign();
+  return {
+    frame:value.frame||"solid",
+    frameColor:value.frameColor||"#d79bab",
+    frameWidth:Number(value.frameWidth)||0.05,
+    pieces:Array.isArray(value.pieces)?value.pieces:[]
+  };
+}
+
 function newAlbum(){
-  document.getElementById("albumTitle").value="";
-
-  const now=new Date();
-  const local=new Date(
-    now.getTime()-now.getTimezoneOffset()*60000
-  );
-
-  document.getElementById("albumDate").value=
-    local.toISOString().slice(0,10);
-
+  $("albumTitle").value="";
+  $("albumDate").value=new Date().toISOString().slice(0,10);
   show("createScreen");
 }
 
 async function createAlbum(){
-  const title=document.getElementById("albumTitle").value.trim();
-  const date=document.getElementById("albumDate").value;
-
-  if(!title||!date){
-    alert("Albüm adı ve tarih gir.");
-    return;
-  }
-
-  const album={
-    id:crypto.randomUUID(),
+  const title=$("albumTitle").value.trim();
+  if(!title)return alert("Önce albüm adı yaz.");
+  const a={
+    id:uid(),
     title,
-    date,
-    theme:"floral",
-    media:[]
+    date:$("albumDate").value,
+    theme:"pink",
+    media:[],
+    design:defaultDesign()
   };
-
-  await saveAlbum(album);
-  await openAlbum(album.id);
-}
-
-function revokeUrls(){
-  urls.forEach(u=>URL.revokeObjectURL(u));
-  urls=[];
-}
-
-function fileUrl(blob){
-  const url=URL.createObjectURL(blob);
-  urls.push(url);
-  return url;
+  await saveAlbum(a);
+  await openAlbum(a.id);
 }
 
 async function renderAlbums(){
-  const area=document.getElementById("albumList");
   const albums=await allAlbums();
-
-  albums.sort((a,b)=>b.date.localeCompare(a.date));
-  area.replaceChildren();
+  const list=$("albumList");
+  list.replaceChildren();
 
   if(!albums.length){
-    const empty=document.createElement("div");
-    empty.className="card empty";
-    empty.style.gridColumn="1/-1";
-    empty.textContent="Henüz albümün yok ♡";
-    area.append(empty);
+    list.innerHTML='<p class="muted">Henüz albümün yok ♡</p>';
     return;
   }
 
-  for(const album of albums){
-    const card=document.createElement("button");
-    card.className="album-card";
-    card.onclick=()=>openAlbum(album.id);
+  albums.sort((a,b)=>(b.date||"").localeCompare(a.date||""));
 
-    const cover=document.createElement("div");
-    cover.className="album-cover";
+  for(const a of albums){
+    const b=document.createElement("button");
+    b.className="album-tile";
 
-    const firstPhoto=album.media.find(m=>m.type==="image");
-
-    if(firstPhoto){
-      const img=document.createElement("img");
-      img.src=URL.createObjectURL(firstPhoto.blob);
-      img.onload=()=>URL.revokeObjectURL(img.src);
-      cover.append(img);
-    }else{
-      cover.textContent="♡";
-    }
-
-    const info=document.createElement("div");
-    info.className="album-info";
+    const icon=document.createElement("div");
+    icon.className="emoji";
+    icon.textContent="♡";
 
     const title=document.createElement("strong");
-    title.textContent=album.title;
+    title.textContent=a.title;
 
     const date=document.createElement("small");
-    date.textContent=album.date;
+    date.textContent=a.date||"";
 
-    info.append(title,date);
-    card.append(cover,info);
-    area.append(card);
+    b.append(icon,title,date);
+    b.onclick=()=>openAlbum(a.id);
+    list.append(b);
   }
 }
 
-async function openAlbum(id){
-  active=await getAlbum(id);
+function revokeUrls(){
+  objectUrls.forEach(URL.revokeObjectURL);
+  objectUrls=[];
+}
 
-  if(!active){
-    alert("Bu albüm cihazında yok. Yedeğini geri yükle.");
+function fileUrl(blob){
+  const u=URL.createObjectURL(blob);
+  objectUrls.push(u);
+  return u;
+}
+
+async function openAlbum(id){
+  const a=await getAlbum(id);
+  if(!a){
+    alert("Bu albüm bu cihazda bulunamadı. Yedeğini geri yüklemen gerekebilir.");
     return;
   }
-
-  show("albumScreen");
+  currentAlbumId=id;
+  currentAlbum=a;
+  $("openAlbumTitle").textContent=a.title;
+  $("openAlbumDate").textContent=a.date||"";
   renderMedia();
+  show("albumScreen");
 }
 
 function renderMedia(){
   revokeUrls();
+  const box=$("mediaList");
+  box.replaceChildren();
 
-  document.getElementById("currentTitle").textContent=
-    active.title+" ♡";
+  for(const m of currentAlbum.media||[]){
+    const card=document.createElement("div");
+    card.className="media-card";
+    let el;
 
-  document.getElementById("currentDate").textContent=
-    active.date;
-
-  const areas={
-    image:document.getElementById("images"),
-    audio:document.getElementById("audios"),
-    video:document.getElementById("videos")
-  };
-
-  Object.values(areas).forEach(a=>a.replaceChildren());
-
-  for(const m of active.media){
-    const box=document.createElement("div");
-    box.className="media "+m.type;
-
-    const tag=
-      m.type==="image"?"img":
-      m.type==="audio"?"audio":"video";
-
-    const el=document.createElement(tag);
-    el.src=fileUrl(m.blob);
-
-    if(tag!=="img"){
+    if(m.type.startsWith("image/")){
+      el=document.createElement("img");
+      el.src=fileUrl(m.blob);
+    }else if(m.type.startsWith("video/")){
+      el=document.createElement("video");
+      el.src=fileUrl(m.blob);
       el.controls=true;
-      el.playsInline=true;
+    }else{
+      el=document.createElement("audio");
+      el.src=fileUrl(m.blob);
+      el.controls=true;
     }
 
     const del=document.createElement("button");
-    del.className="delete";
-    del.textContent="×";
+    del.className="btn danger delete-media";
+    del.textContent="🗑";
     del.onclick=()=>removeMedia(m.id);
 
-    box.append(el,del);
-    areas[m.type]?.append(box);
+    card.append(el,del);
+    box.append(card);
   }
 }
 
-async function upload(input,type){
-  if(!active)return;
+async function upload(files){
+  if(!currentAlbum)return;
+  const a=await getAlbum(currentAlbumId);
+  if(!Array.isArray(a.media))a.media=[];
 
-  for(const file of [...input.files]){
-    if(!file.type.startsWith(type+"/"))continue;
-
-    if(file.size>30*1024*1024){
-      alert(file.name+" çok büyük. 30 MB sınırı var.");
-      continue;
-    }
-
-    active.media.push({
-      id:crypto.randomUUID(),
-      type,
-      name:file.name,
-      blob:file
+  for(const f of files){
+    if(!/^(image|video|audio)\//.test(f.type))continue;
+    a.media.push({
+      id:uid(),
+      type:f.type,
+      name:f.name,
+      blob:f
     });
   }
 
-  try{
-    await saveAlbum(active);
-    renderMedia();
-  }catch(e){
-    alert("Cihazda yeterli depolama alanı olmayabilir.");
-    active=await getAlbum(active.id);
-  }
-
-  input.value="";
+  await saveAlbum(a);
+  currentAlbum=a;
+  renderMedia();
 }
 
 async function removeMedia(id){
-  if(!confirm("Bu dosya silinsin mi?"))return;
-
-  active.media=active.media.filter(m=>m.id!==id);
-  await saveAlbum(active);
+  if(!confirm("Bu dosyayı silmek istiyor musun?"))return;
+  const a=await getAlbum(currentAlbumId);
+  a.media=(a.media||[]).filter(m=>m.id!==id);
+  await saveAlbum(a);
+  currentAlbum=a;
   renderMedia();
 }
 
 async function deleteAlbum(){
-  if(!active)return;
-
-  if(!confirm("Albüm ve içindeki dosyalar silinsin mi?")){
-    return;
-  }
-
-  await eraseAlbum(active.id);
-  active=null;
+  if(!confirm("Bu albüm ve içindeki dosyalar silinsin mi?"))return;
+  await eraseAlbum(currentAlbumId);
+  currentAlbumId=null;
+  currentAlbum=null;
   show("home");
 }
 
-/* QR BAĞLANTISI */
-
 function albumLink(id){
-  const base=APP_URL.trim()||
-    location.href.split("?")[0].split("#")[0];
-
-  const url=new URL(base,location.href);
-  url.searchParams.set("id",id);
-
-  return url.href;
+  return APP_URL+"?id="+encodeURIComponent(id);
 }
 
-/*
-  QR'ı beyaz kenar boşluğu ile SVG olarak üretir.
-  Çerçeve QR deseninin üzerine gelmez.
-*/
-function qrSVG(text){
-  const temp=document.createElement("div");
+/* QR OLUŞTURMA */
 
-  new QRCode(temp,{
-    text,
-    width:320,
-    height:320,
-    correctLevel:QRCode.CorrectLevel.M
+async function qrData(id){
+  if(qrCache.has(id))return qrCache.get(id);
+
+  if(typeof QRCode==="undefined")
+    throw Error("QR kütüphanesi yüklenemedi. İnternet bağlantını kontrol et.");
+
+  const holder=document.createElement("div");
+  holder.style.cssText=
+    "position:fixed;left:-10000px;top:-10000px;width:512px;height:512px";
+  document.body.append(holder);
+
+  try{
+    new QRCode(holder,{
+      text:albumLink(id),
+      width:512,
+      height:512,
+      correctLevel:QRCode.CorrectLevel.H,
+      colorDark:"#000000",
+      colorLight:"#ffffff"
+    });
+
+    await new Promise(r=>setTimeout(r,100));
+
+    const canvas=holder.querySelector("canvas");
+    const img=holder.querySelector("img");
+    let data;
+
+    if(canvas)data=canvas.toDataURL("image/png");
+    else if(img?.src)data=img.src;
+    else throw Error("QR oluşturulamadı.");
+
+    qrCache.set(id,data);
+    return data;
+  }finally{
+    holder.remove();
+  }
+}
+
+/* TASARIM ATÖLYESİ */
+
+async function openStudio(){
+  if(!currentAlbumId)return;
+  const a=await getAlbum(currentAlbumId);
+  currentAlbum=a;
+  design=normalizeDesign(a.design);
+  selectedPiece=null;
+  history=[];
+  studioTab="decor";
+  show("studioScreen");
+
+  $("studioQR").replaceChildren();
+  const img=document.createElement("img");
+  img.alt="Albüm QR kodu";
+  img.src=await qrData(a.id);
+  $("studioQR").append(img);
+
+  renderStudio();
+  renderStudioPanel();
+}
+
+function rememberDesign(){
+  history.push(JSON.stringify(design));
+  if(history.length>40)history.shift();
+}
+
+function undoDesign(){
+  if(!history.length)return;
+  design=JSON.parse(history.pop());
+  if(!design.pieces.some(p=>p.id===selectedPiece))
+    selectedPiece=null;
+  renderStudio();
+  renderStudioPanel();
+}
+
+function getSelected(){
+  return design.pieces.find(p=>p.id===selectedPiece);
+}
+
+/* QR koruma alanı: figür merkezlerini dış kenarlarda tut */
+function safePosition(x,y,size=18){
+  x=Math.max(5,Math.min(95,x));
+  y=Math.max(5,Math.min(95,y));
+
+  const margin=Math.min(8,size/6);
+  const lo=14-margin;
+  const hi=86+margin;
+
+  if(x>lo&&x<hi&&y>lo&&y<hi){
+    const distances=[
+      {d:x-lo,axis:"x",v:lo},
+      {d:hi-x,axis:"x",v:hi},
+      {d:y-lo,axis:"y",v:lo},
+      {d:hi-y,axis:"y",v:hi}
+    ].sort((a,b)=>a.d-b.d);
+    const edge=distances[0];
+    if(edge.axis==="x")x=edge.v;
+    else y=edge.v;
+  }
+
+  return {x,y};
+}
+
+function addDecoration(symbol){
+  rememberDesign();
+  const positions=[
+    [7,7],[93,7],[7,93],[93,93],
+    [50,7],[50,93],[7,50],[93,50]
+  ];
+  const i=design.pieces.length%positions.length;
+  const p={
+    id:uid(),
+    symbol,
+    x:positions[i][0],
+    y:positions[i][1],
+    size:20,
+    rotation:0,
+    color:"#d79bab",
+    opacity:1
+  };
+  design.pieces.push(p);
+  selectedPiece=p.id;
+  renderStudio();
+  setStudioTab("color");
+}
+
+function renderStudio(){
+  const frame=$("studioFrame");
+  const pieces=$("studioPieces");
+  frame.replaceChildren();
+  pieces.replaceChildren();
+
+  if(design.frame!=="none"){
+    const rect=document.createElementNS(
+      "http://www.w3.org/2000/svg","rect"
+    );
+    rect.setAttribute("x","2");
+    rect.setAttribute("y","2");
+    rect.setAttribute("width","296");
+    rect.setAttribute("height","296");
+    rect.setAttribute("rx",design.frame==="rounded"?"25":"0");
+    rect.setAttribute("fill","none");
+    rect.setAttribute("stroke",design.frameColor);
+    rect.setAttribute("stroke-width",design.frameWidth*300/20);
+    if(design.frame==="dashed")
+      rect.setAttribute("stroke-dasharray","8 5");
+    if(design.frame==="dotted")
+      rect.setAttribute("stroke-dasharray","1 5");
+    frame.append(rect);
+  }
+
+  for(const p of design.pieces){
+    const el=document.createElement("div");
+    el.className="studio-piece"+
+      (selectedPiece===p.id?" selected":"");
+    el.textContent=p.symbol;
+    el.style.left=p.x+"%";
+    el.style.top=p.y+"%";
+    el.style.fontSize=p.size+"px";
+    el.style.color=p.color;
+    el.style.opacity=p.opacity;
+    el.style.transform=
+      `translate(-50%,-50%) rotate(${p.rotation}deg)`;
+
+    el.addEventListener("pointerdown",e=>{
+      e.preventDefault();
+      e.stopPropagation();
+      selectedPiece=p.id;
+      rememberDesign();
+      el.setPointerCapture(e.pointerId);
+      renderStudioPanel();
+
+      const move=ev=>{
+        const r=$("studioBoard").getBoundingClientRect();
+        const x=(ev.clientX-r.left)/r.width*100;
+        const y=(ev.clientY-r.top)/r.height*100;
+        const pos=safePosition(x,y,p.size);
+        p.x=pos.x;
+        p.y=pos.y;
+        el.style.left=p.x+"%";
+        el.style.top=p.y+"%";
+      };
+
+      const end=()=>{
+        el.removeEventListener("pointermove",move);
+        el.removeEventListener("pointerup",end);
+        el.removeEventListener("pointercancel",end);
+        renderStudio();
+      };
+
+      el.addEventListener("pointermove",move);
+      el.addEventListener("pointerup",end);
+      el.addEventListener("pointercancel",end);
+    });
+
+    pieces.append(el);
+  }
+}
+
+function removeSelected(){
+  if(!selectedPiece)return;
+  rememberDesign();
+  design.pieces=design.pieces.filter(p=>p.id!==selectedPiece);
+  selectedPiece=null;
+  renderStudio();
+  renderStudioPanel();
+}
+
+function duplicateSelected(){
+  const p=getSelected();
+  if(!p)return;
+  rememberDesign();
+  const copy={...p,id:uid()};
+  const pos=safePosition(p.x+5,p.y+5,p.size);
+  copy.x=pos.x;
+  copy.y=pos.y;
+  design.pieces.push(copy);
+  selectedPiece=copy.id;
+  renderStudio();
+  renderStudioPanel();
+}
+
+function setStudioTab(tab){
+  studioTab=tab;
+  document.querySelectorAll("[data-tab]").forEach(b=>{
+    b.classList.toggle("active",b.dataset.tab===tab);
   });
+  renderStudioPanel();
+}
 
-  const canvas=temp.querySelector("canvas");
-  if(!canvas){
-    throw new Error("QR oluşturulamadı");
-  }
+function panelButton(text,fn){
+  const b=document.createElement("button");
+  b.className="btn";
+  b.textContent=text;
+  b.onclick=fn;
+  return b;
+}
 
-  const ctx=canvas.getContext("2d");
-  const size=canvas.width;
-  const pixels=ctx.getImageData(0,0,size,size).data;
+function panelText(text){
+  const p=document.createElement("p");
+  p.className="muted";
+  p.textContent=text;
+  return p;
+}
 
-  /*
-    QRCode.js çıktısı kare modüllerden oluşur.
-    Önce siyah-beyaz geçişlerden modül boyutunu bul.
-  */
-  const row=Math.floor(size/2);
-  let runs=[];
-  let last=null;
-  let count=0;
+function renderStudioPanel(){
+  const panel=$("studioPanel");
+  panel.replaceChildren();
 
-  for(let x=0;x<size;x++){
-    const i=(row*size+x)*4;
-    const dark=pixels[i]<128;
+  if(studioTab==="decor"){
+    for(const [group,symbols] of Object.entries(DECORATIONS)){
+      const h=document.createElement("h3");
+      h.textContent=group;
+      h.style.fontSize="14px";
+      panel.append(h);
 
-    if(last===null){
-      last=dark;
-      count=1;
-    }else if(dark===last){
-      count++;
-    }else{
-      runs.push(count);
-      last=dark;
-      count=1;
-    }
-  }
-  runs.push(count);
+      const grid=document.createElement("div");
+      grid.className="symbol-grid";
 
-  const gcd=(a,b)=>b?gcd(b,a%b):a;
-  const unit=runs.reduce((a,b)=>gcd(a,b),0);
-
-  /*
-    Modül ölçüsü güvenilir bulunamazsa
-    mevcut QR canvas'ını kullan.
-  */
-  if(!unit||unit<2){
-    const img=document.createElement("img");
-    img.src=canvas.toDataURL("image/png");
-    return img;
-  }
-
-  const n=Math.round(size/unit);
-  const quiet=4;
-  const total=n+quiet*2;
-
-  const svg=document.createElementNS(
-    "http://www.w3.org/2000/svg","svg"
-  );
-
-  svg.setAttribute("viewBox",`0 0 ${total} ${total}`);
-  svg.setAttribute("xmlns","http://www.w3.org/2000/svg");
-
-  const bg=document.createElementNS(
-    "http://www.w3.org/2000/svg","rect"
-  );
-  bg.setAttribute("width",total);
-  bg.setAttribute("height",total);
-  bg.setAttribute("fill","white");
-  svg.append(bg);
-
-  for(let y=0;y<n;y++){
-    for(let x=0;x<n;x++){
-      const px=Math.min(
-        size-1,Math.floor((x+.5)*unit)
-      );
-      const py=Math.min(
-        size-1,Math.floor((y+.5)*unit)
-      );
-
-      const i=(py*size+px)*4;
-
-      if(pixels[i]<128){
-        const rect=document.createElementNS(
-          "http://www.w3.org/2000/svg","rect"
-        );
-
-        rect.setAttribute("x",x+quiet);
-        rect.setAttribute("y",y+quiet);
-        rect.setAttribute("width",1);
-        rect.setAttribute("height",1);
-        rect.setAttribute("fill","black");
-
-        svg.append(rect);
+      for(const symbol of symbols){
+        const b=document.createElement("button");
+        b.className="symbol";
+        b.textContent=symbol;
+        b.onclick=()=>addDecoration(symbol);
+        grid.append(b);
       }
+      panel.append(grid);
     }
+    return;
   }
 
-  return svg;
-}
+  if(studioTab==="color"){
+    const p=getSelected();
 
-/* QR ÇIKARTMASI */
-
-function sticker(album){
-  const style=styleOf(album.theme);
-
-  const el=document.createElement("div");
-  el.className="sticker "+style.css;
-  el.style.setProperty("--frame",style.color);
-
-  const frame=document.createElement("div");
-  frame.className="frame";
-
-  const qr=document.createElement("div");
-  qr.className="qr";
-
-  qr.append(qrSVG(albumLink(album.id)));
-  el.append(frame,qr);
-
-  return el;
-}
-
-function renderStyleOptions(){
-  const grid=document.getElementById("styleGrid");
-  grid.replaceChildren();
-
-  for(const style of STYLES){
-    const btn=document.createElement("button");
-    btn.className="style-option";
-
-    if(active?.theme===style.id){
-      btn.classList.add("selected");
+    if(!p){
+      panel.append(panelText("Önce rengini değiştirmek istediğin süslemeye dokun."));
+      return;
     }
 
-    const swatch=document.createElement("span");
-    swatch.className="style-swatch "+style.css;
-    swatch.style.setProperty("--swatch",style.color);
+    const h=document.createElement("h3");
+    h.textContent="Seçili süslemenin rengi";
+    panel.append(h);
 
-    const name=document.createElement("span");
-    name.textContent=style.name;
+    const palette=document.createElement("div");
+    palette.className="palette";
 
-    btn.append(swatch,name);
-    btn.onclick=()=>changeTheme(style.id);
+    for(const color of PALETTE){
+      const b=document.createElement("button");
+      b.className="swatch"+(p.color===color?" active":"");
+      b.style.background=color;
+      b.title=color;
+      b.onclick=()=>{
+        rememberDesign();
+        p.color=color;
+        renderStudio();
+        renderStudioPanel();
+      };
+      palette.append(b);
+    }
 
-    grid.append(btn);
+    panel.append(palette);
+
+    const lab=document.createElement("label");
+    lab.textContent="Özel renk seç";
+    const picker=document.createElement("input");
+    picker.type="color";
+    picker.value=p.color;
+    picker.style.cssText="width:100%;height:45px;border:0;background:white";
+    picker.oninput=()=>{
+      p.color=picker.value;
+      renderStudio();
+    };
+    panel.append(lab,picker);
+    return;
+  }
+
+  if(studioTab==="edit"){
+    const p=getSelected();
+
+    if(!p){
+      panel.append(panelText("Düzenlemek için bir süsleme seç."));
+      return;
+    }
+
+    function rangeControl(title,key,min,max,step){
+      const lab=document.createElement("label");
+      lab.textContent=title+": "+p[key];
+      const input=document.createElement("input");
+      input.type="range";
+      input.min=min;input.max=max;input.step=step;
+      input.value=p[key];
+      input.oninput=()=>{
+        p[key]=Number(input.value);
+        if(key==="size"){
+          const pos=safePosition(p.x,p.y,p.size);
+          p.x=pos.x;p.y=pos.y;
+        }
+        lab.textContent=title+": "+p[key];
+        renderStudio();
+      };
+      panel.append(lab,input);
+    }
+
+    rangeControl("Boyut","size",8,44,1);
+    rangeControl("Döndürme","rotation",0,360,1);
+    rangeControl("Opaklık","opacity",0.2,1,0.05);
+
+    const row=document.createElement("div");
+    row.className="row";
+    row.style.marginTop="15px";
+    row.append(
+      panelButton("⧉ Çoğalt",duplicateSelected),
+      panelButton("🗑 Çöp kutusu",removeSelected)
+    );
+    panel.append(row);
+    return;
+  }
+
+  if(studioTab==="frame"){
+    const title=document.createElement("h3");
+    title.textContent="Çerçeve biçimi";
+    panel.append(title);
+
+    const row=document.createElement("div");
+    row.className="row";
+
+    for(const [value,name] of [
+      ["none","Yok"],
+      ["solid","Düz"],
+      ["rounded","Yuvarlak"],
+      ["dashed","Kesik"],
+      ["dotted","Noktalı"]
+    ]){
+      const b=panelButton(name,()=>{
+        rememberDesign();
+        design.frame=value;
+        renderStudio();
+        renderStudioPanel();
+      });
+      if(design.frame===value)b.classList.add("active");
+      row.append(b);
+    }
+    panel.append(row);
+
+    const lab=document.createElement("label");
+    lab.textContent="Çerçeve rengi";
+    const picker=document.createElement("input");
+    picker.type="color";
+    picker.value=design.frameColor;
+    picker.style.cssText="width:100%;height:45px;border:0;background:white";
+    picker.oninput=()=>{
+      design.frameColor=picker.value;
+      renderStudio();
+    };
+
+    const thickLabel=document.createElement("label");
+    thickLabel.textContent="Çizgi kalınlığı (mm): "+design.frameWidth;
+    const range=document.createElement("input");
+    range.type="range";
+    range.min="0.05";
+    range.max="0.5";
+    range.step="0.05";
+    range.value=design.frameWidth;
+    range.oninput=()=>{
+      design.frameWidth=Number(range.value);
+      thickLabel.textContent="Çizgi kalınlığı (mm): "+design.frameWidth;
+      renderStudio();
+    };
+
+    panel.append(lab,picker,thickLabel,range);
   }
 }
 
-function openQR(){
-  if(!active)return;
+async function saveDesign(){
+  if(!currentAlbumId)return;
+  const a=await getAlbum(currentAlbumId);
+  a.design=JSON.parse(JSON.stringify(design));
+  await saveAlbum(a);
+  currentAlbum=a;
+  alert("QR tasarımın kaydedildi ♡");
+}
+
+/* ÇIKARTMA OLUŞTURMA */
+
+function loadImage(src){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>resolve(img);
+    img.onerror=()=>reject(Error("Görsel yüklenemedi."));
+    img.src=src;
+  });
+}
+
+async function stickerCanvas(album,size=800,override=null){
+  const d=normalizeDesign(override||album.design);
+  const canvas=document.createElement("canvas");
+  canvas.width=size;
+  canvas.height=size;
+  const ctx=canvas.getContext("2d");
+  const scale=size/300;
+
+  ctx.scale(scale,scale);
+
+  /* QR alanının altı beyaz, çevresi şeffaf */
+  ctx.fillStyle="#ffffff";
+  ctx.fillRect(42,42,216,216);
+
+  const img=await loadImage(await qrData(album.id));
+  ctx.drawImage(img,47,47,206,206);
+
+  /* Çerçeve */
+  if(d.frame!=="none"){
+    ctx.save();
+    ctx.strokeStyle=d.frameColor;
+    ctx.lineWidth=d.frameWidth*15;
+    if(d.frame==="dashed")ctx.setLineDash([8,5]);
+    if(d.frame==="dotted")ctx.setLineDash([1,5]);
+
+    ctx.beginPath();
+    if(d.frame==="rounded"){
+      ctx.roundRect(2,2,296,296,25);
+    }else{
+      ctx.rect(2,2,296,296);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  /* Süslemeler */
+  for(const p of d.pieces){
+    ctx.save();
+    ctx.translate(p.x*3,p.y*3);
+    ctx.rotate((p.rotation||0)*Math.PI/180);
+    ctx.globalAlpha=p.opacity??1;
+    ctx.fillStyle=p.color||"#d79bab";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.font=`${p.size||20}px Georgia,serif`;
+    ctx.fillText(p.symbol||"✿",0,0);
+    ctx.restore();
+  }
+
+  return canvas;
+}
+
+async function openQR(){
+  if(!currentAlbumId)return;
+  const a=await getAlbum(currentAlbumId);
+  const box=$("qrPreview");
+  box.replaceChildren();
+
+  const canvas=await stickerCanvas(a,800,design);
+  const img=document.createElement("img");
+  img.src=canvas.toDataURL("image/png");
+  img.alt="QR çıkartma önizlemesi";
+  box.append(img);
 
   show("qrScreen");
-  renderStyleOptions();
-
-  const preview=document.getElementById("qrPreview");
-  preview.replaceChildren(sticker(active));
 }
 
-async function changeTheme(theme){
-  if(!active)return;
-
-  active.theme=theme;
-  await saveAlbum(active);
-  openQR();
+function downloadBlob(blob,name){
+  const u=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=u;
+  a.download=name;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(u),1000);
 }
 
-/*
-  PNG çıkışı:
-  600 x 600 px = 20 x 20 mm
-  762 DPI bilgisi tarayıcıya göre korunmayabilir.
-  Yazdırırken 20 mm ölçü seçilmelidir.
-*/
 async function downloadQR(){
-  if(!active)return;
-
-  const st=sticker(active);
-  const svg=st.querySelector("svg");
-  const img=st.querySelector(".qr img");
-
-  const canvas=document.createElement("canvas");
-  canvas.width=600;
-  canvas.height=600;
-
-  const ctx=canvas.getContext("2d");
-  ctx.fillStyle="white";
-  ctx.fillRect(0,0,600,600);
-
-  const style=styleOf(active.theme);
-  ctx.strokeStyle=style.color;
-  ctx.lineWidth=8;
-
-  if(style.css!=="none"){
-    ctx.beginPath();
-
-    if(style.css==="rounded"||style.css==="soft"){
-      const radius=style.css==="rounded"?50:20;
-      ctx.roundRect(10,10,580,580,radius);
-      ctx.stroke();
-    }else if(style.css==="corner"){
-      const k=105;
-      const a=12,b=588;
-
-      for(const [x,y,sx,sy] of [
-        [a,a,1,1],[b,a,-1,1],
-        [a,b,1,-1],[b,b,-1,-1]
-      ]){
-        ctx.beginPath();
-        ctx.moveTo(x+sx*k,y);
-        ctx.lineTo(x,y);
-        ctx.lineTo(x,y+sy*k);
-        ctx.stroke();
-      }
-    }else{
-      if(style.css==="dashed")ctx.setLineDash([15,10]);
-      if(style.css==="dotted")ctx.setLineDash([3,12]);
-
-      ctx.strokeRect(10,10,580,580);
-      ctx.setLineDash([]);
-
-      if(style.css==="double"){
-        ctx.strokeRect(24,24,552,552);
-      }
-    }
+  try{
+    const a=await getAlbum(currentAlbumId);
+    const c=await stickerCanvas(a,1000,design);
+    c.toBlob(blob=>{
+      if(blob)downloadBlob(blob,"ani-kutusu-qr.png");
+    },"image/png");
+  }catch(e){
+    alert("PNG oluşturulamadı: "+e.message);
   }
-
-  const qrImage=new Image();
-
-  const source=svg
-    ? "data:image/svg+xml;charset=utf-8,"+
-      encodeURIComponent(new XMLSerializer().serializeToString(svg))
-    : img.src;
-
-  qrImage.onload=()=>{
-    ctx.imageSmoothingEnabled=false;
-    ctx.drawImage(qrImage,42,42,516,516);
-
-    const a=document.createElement("a");
-    a.download="ani-qr-"+active.id+".png";
-    a.href=canvas.toDataURL("image/png");
-    a.click();
-  };
-
-  qrImage.onerror=()=>alert("QR görseli oluşturulamadı.");
-  qrImage.src=source;
 }
 
-async function openPrint(){
-  show("printScreen");
+/* A4 PDF BASKI MERKEZİ */
 
-  const area=document.getElementById("printGrid");
-  area.replaceChildren();
+async function openSelection(){
+  selectionAlbums=await allAlbums();
+  selectionAlbums.sort((a,b)=>
+    (b.date||"").localeCompare(a.date||"")
+  );
 
+  selectionIds=new Set();
+  renderSelection();
+  show("selectionScreen");
+}
+
+function renderSelection(){
+  const box=$("selectionList");
+  box.replaceChildren();
+
+  if(!selectionAlbums.length){
+    box.append(panelText("Henüz albüm bulunmuyor."));
+  }
+
+  for(const a of selectionAlbums){
+    const row=document.createElement("label");
+    row.className="selection-item";
+    row.style.margin="0";
+
+    const check=document.createElement("input");
+    check.type="checkbox";
+    check.checked=selectionIds.has(a.id);
+
+    check.onchange=()=>{
+      if(check.checked)selectionIds.add(a.id);
+      else selectionIds.delete(a.id);
+      updateSelectionCount();
+    };
+
+    const name=document.createElement("span");
+    name.textContent=a.title;
+
+    const icon=document.createElement("span");
+    icon.textContent="▦";
+
+    row.append(check,name,icon);
+    box.append(row);
+  }
+
+  updateSelectionCount();
+}
+
+function updateSelectionCount(){
+  $("selectionCount").textContent=
+    selectionIds.size+" albüm seçildi";
+  $("selectedPDFButton").disabled=selectionIds.size===0;
+}
+
+function toggleAllSelections(){
+  if(selectionIds.size===selectionAlbums.length){
+    selectionIds.clear();
+  }else{
+    selectionIds=new Set(selectionAlbums.map(a=>a.id));
+  }
+  renderSelection();
+}
+
+async function exportSelectedPDF(){
+  const albums=selectionAlbums.filter(a=>selectionIds.has(a.id));
+  await createA4PDF(albums,"secili-qr-cikartmalari.pdf");
+}
+
+async function exportAllPDF(){
   const albums=await allAlbums();
+  await createA4PDF(albums,"tum-qr-cikartmalari.pdf");
+}
 
-  for(const album of albums){
-    area.append(sticker(album));
+async function exportCurrentPDF(){
+  if(!currentAlbumId)return;
+  const a=await getAlbum(currentAlbumId);
+
+  /* Atölyede henüz kaydedilmemiş düzenlemeleri de kullan */
+  const copy={...a};
+  if(design && $("studioScreen").classList.contains("show"))
+    copy.design=design;
+  if(design && $("qrScreen").classList.contains("show"))
+    copy.design=design;
+
+  await createA4PDF([copy],"tek-album-qr.pdf");
+}
+
+async function createA4PDF(albums,filename){
+  if(!albums.length){
+    alert("PDF için en az bir albüm seç.");
+    return;
+  }
+
+  if(!window.jspdf){
+    alert("PDF kütüphanesi yüklenemedi. İnternet bağlantını kontrol et.");
+    return;
+  }
+
+  const {jsPDF}=window.jspdf;
+
+  /*
+    A4: 210 × 297 mm
+    QR: 20 × 20 mm
+    Yatay boşluk: 5 mm
+    Dikey boşluk: 5 mm
+    7 sütun × 10 satır = 70 çıkartma
+  */
+
+  const pdf=new jsPDF({
+    orientation:"portrait",
+    unit:"mm",
+    format:"a4",
+    compress:true
+  });
+
+  const sticker=20;
+  const gap=5;
+  const columns=7;
+  const rows=10;
+  const perPage=columns*rows;
+
+  const usedWidth=columns*sticker+(columns-1)*gap;
+  const usedHeight=rows*sticker+(rows-1)*gap;
+
+  const startX=(210-usedWidth)/2;
+  const startY=(297-usedHeight)/2;
+
+  try{
+    for(let i=0;i<albums.length;i++){
+      if(i>0 && i%perPage===0)pdf.addPage();
+
+      const pageIndex=i%perPage;
+      const col=pageIndex%columns;
+      const row=Math.floor(pageIndex/columns);
+
+      const x=startX+col*(sticker+gap);
+      const y=startY+row*(sticker+gap);
+
+      const canvas=await stickerCanvas(albums[i],800);
+      const data=canvas.toDataURL("image/png");
+
+      pdf.addImage(
+        data,
+        "PNG",
+        x,
+        y,
+        sticker,
+        sticker,
+        undefined,
+        "FAST"
+      );
+    }
+
+    pdf.save(filename);
+  }catch(e){
+    console.error(e);
+    alert("PDF hazırlanamadı: "+e.message);
   }
 }
 
-/* ŞİFRELİ YEDEK */
-
-const enc=new TextEncoder();
-const dec=new TextDecoder();
+/* ŞİFRELİ YEDEKLEME */
 
 function bytesToBase64(bytes){
-  let result="";
-
+  let out="";
   for(let i=0;i<bytes.length;i+=8192){
-    result+=String.fromCharCode(
-      ...bytes.subarray(i,i+8192)
-    );
+    out+=String.fromCharCode(...bytes.subarray(i,i+8192));
   }
-
-  return btoa(result);
+  return btoa(out);
 }
 
-function base64ToBytes(s){
-  const raw=atob(s);
-  const arr=new Uint8Array(raw.length);
+function base64ToBytes(str){
+  const binary=atob(str);
+  const bytes=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++)
+    bytes[i]=binary.charCodeAt(i);
+  return bytes;
+}
 
-  for(let i=0;i<raw.length;i++){
-    arr[i]=raw.charCodeAt(i);
-  }
+async function blobToDataURL(blob){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(reader.result);
+    reader.onerror=()=>reject(reader.error);
+    reader.readAsDataURL(blob);
+  });
+}
 
-  return arr;
+function dataURLToBlob(data){
+  const [header,base64]=data.split(",");
+  const type=header.match(/data:(.*?);/)?.[1]||
+    "application/octet-stream";
+  return new Blob([base64ToBytes(base64)],{type});
 }
 
 async function deriveKey(password,salt){
-  const material=await crypto.subtle.importKey(
+  const base=await crypto.subtle.importKey(
     "raw",
-    enc.encode(password),
+    new TextEncoder().encode(password),
     "PBKDF2",
     false,
     ["deriveKey"]
@@ -1274,274 +1428,193 @@ async function deriveKey(password,salt){
     {
       name:"PBKDF2",
       salt,
-      iterations:250000,
+      iterations:200000,
       hash:"SHA-256"
     },
-    material,
+    base,
     {name:"AES-GCM",length:256},
     false,
     ["encrypt","decrypt"]
   );
 }
 
-async function encryptText(text,password){
-  const salt=crypto.getRandomValues(new Uint8Array(16));
-  const iv=crypto.getRandomValues(new Uint8Array(12));
-  const key=await deriveKey(password,salt);
-
-  const encrypted=await crypto.subtle.encrypt(
-    {name:"AES-GCM",iv},
-    key,
-    enc.encode(text)
-  );
-
-  return{
-    version:1,
-    encryption:"AES-256-GCM",
-    salt:bytesToBase64(salt),
-    iv:bytesToBase64(iv),
-    data:bytesToBase64(new Uint8Array(encrypted))
-  };
-}
-
-async function decryptText(obj,password){
-  const salt=base64ToBytes(obj.salt);
-  const iv=base64ToBytes(obj.iv);
-  const key=await deriveKey(password,salt);
-
-  const decrypted=await crypto.subtle.decrypt(
-    {name:"AES-GCM",iv},
-    key,
-    base64ToBytes(obj.data)
-  );
-
-  return dec.decode(decrypted);
-}
-
-function downloadBlob(blob,name){
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-
-  a.href=url;
-  a.download=name;
-  a.click();
-
-  setTimeout(()=>URL.revokeObjectURL(url),10000);
-}
-
 async function backup(){
-  const password=prompt(
-    "Yedeği koruyacak güçlü bir şifre oluştur:"
-  );
-
+  const password=prompt("Yedek dosyasını koruyacak bir şifre belirle:");
   if(!password)return;
-
-  if(password.length<10){
-    alert("En az 10 karakter kullan.");
-    return;
-  }
-
-  const again=prompt("Şifreyi tekrar gir:");
-
-  if(password!==again){
-    alert("Şifreler eşleşmedi.");
+  if(password.length<6){
+    alert("En az 6 karakterlik bir yedek şifresi seç.");
     return;
   }
 
   try{
     const albums=await allAlbums();
-    const result=[];
+    const portable=[];
 
     for(const a of albums){
-      const media=[];
-
-      for(const m of a.media){
-        const data=bytesToBase64(
-          new Uint8Array(await m.blob.arrayBuffer())
-        );
-
-        media.push({
+      const copy={...a,media:[]};
+      for(const m of a.media||[]){
+        copy.media.push({
           id:m.id,
           type:m.type,
           name:m.name,
-          mime:m.blob.type,
-          data
+          data:await blobToDataURL(m.blob)
         });
       }
-
-      result.push({...a,media});
+      portable.push(copy);
     }
 
-    const encrypted=await encryptText(
-      JSON.stringify({
-        format:"qr-ani-kutusu",
-        version:1,
-        albums:result
-      }),
-      password
+    const salt=crypto.getRandomValues(new Uint8Array(16));
+    const iv=crypto.getRandomValues(new Uint8Array(12));
+    const key=await deriveKey(password,salt);
+
+    const payload=JSON.stringify({
+      format:"ani-kutusu-backup",
+      version:1,
+      albums:portable
+    });
+
+    const encrypted=await crypto.subtle.encrypt(
+      {name:"AES-GCM",iv},
+      key,
+      new TextEncoder().encode(payload)
     );
 
+    const output={
+      format:"ani-kutusu-encrypted",
+      version:1,
+      salt:bytesToBase64(salt),
+      iv:bytesToBase64(iv),
+      data:bytesToBase64(new Uint8Array(encrypted))
+    };
+
     downloadBlob(
-      new Blob(
-        [JSON.stringify(encrypted)],
-        {type:"application/json"}
-      ),
+      new Blob([JSON.stringify(output)],{type:"application/json"}),
       "ani-kutusu-sifreli-yedek.json"
     );
 
-    alert(
-      "Yedek oluşturuldu. Dosyayı güvenli bir yerde sakla."
-    );
+    alert("Şifreli yedeğin indirildi. Şifreni unutma.");
   }catch(e){
-    console.error(e);
-    alert(
-      "Yedek oluşturulamadı. Büyük videolar belleği zorlayabilir."
-    );
+    alert("Yedek oluşturulamadı: "+e.message);
   }
 }
 
-async function restoreBackup(input){
-  const file=input.files[0];
+async function restoreBackup(file){
   if(!file)return;
 
-  const password=prompt("Yedek şifreni gir:");
-
-  if(!password){
-    input.value="";
-    return;
-  }
+  const password=prompt("Yedek dosyasının şifresini gir:");
+  if(!password)return;
 
   try{
-    const encrypted=JSON.parse(await file.text());
-    const parsed=JSON.parse(
-      await decryptText(encrypted,password)
+    const wrapper=JSON.parse(await file.text());
+    if(wrapper.format!=="ani-kutusu-encrypted")
+      throw Error("Desteklenmeyen yedek biçimi.");
+
+    const key=await deriveKey(
+      password,
+      base64ToBytes(wrapper.salt)
     );
 
-    if(
-      parsed.format!=="qr-ani-kutusu"||
-      !Array.isArray(parsed.albums)
-    ){
-      throw Error("Geçersiz yedek");
-    }
+    const plain=await crypto.subtle.decrypt(
+      {name:"AES-GCM",iv:base64ToBytes(wrapper.iv)},
+      key,
+      base64ToBytes(wrapper.data)
+    );
+
+    const payload=JSON.parse(new TextDecoder().decode(plain));
+
+    if(!Array.isArray(payload.albums))
+      throw Error("Yedek içeriği geçersiz.");
 
     if(!confirm(
-      "Yedekteki albümler aktarılsın mı? Aynı kimlikli albümler değiştirilecek."
-    )){
-      return;
-    }
+      payload.albums.length+
+      " albüm geri yüklenecek. Aynı kimlikli albümler güncellenebilir. Devam?"
+    ))return;
 
-    for(const a of parsed.albums){
-      const media=[];
+    for(const a of payload.albums){
+      const copy={...a,media:[]};
 
-      for(const m of a.media){
-        const bytes=base64ToBytes(m.data);
-
-        media.push({
+      for(const m of a.media||[]){
+        copy.media.push({
           id:m.id,
           type:m.type,
           name:m.name,
-          blob:new Blob([bytes],{type:m.mime})
+          blob:dataURLToBlob(m.data)
         });
       }
 
-      await saveAlbum({...a,media});
+      await saveAlbum(copy);
     }
 
-    alert("Anıların geri yüklendi ♡");
+    alert("Yedek geri yüklendi ♡");
     show("home");
-
   }catch(e){
     console.error(e);
-    alert(
-      "Şifre yanlış, dosya bozuk veya depolama alanı yetersiz."
-    );
-  }finally{
-    input.value="";
+    alert("Yedek açılamadı. Şifreyi veya dosyayı kontrol et.");
   }
 }
 
-/* EKRAN KİLİDİ */
+/* UYGULAMA KİLİDİ */
 
 async function hashPassword(password,salt){
-  const data=enc.encode(salt+password);
+  const data=new TextEncoder().encode(password+salt);
   const hash=await crypto.subtle.digest("SHA-256",data);
   return bytesToBase64(new Uint8Array(hash));
 }
 
 async function setupLock(){
-  const saved=await getSetting("lock");
+  const existing=await getSetting("lock");
+  const overlay=$("lockOverlay");
+  const msg=$("lockMessage");
+  const button=$("lockButton");
+  const input=$("lockPassword");
 
-  if(!saved){
-    const pass=prompt(
-      "Anı Kutusu için ekran kilidi oluştur (en az 8 karakter):"
-    );
+  overlay.classList.add("visible");
+  input.value="";
 
-    if(!pass||pass.length<8){
-      document.getElementById("lockOverlay")
-        .classList.add("visible");
+  if(!existing){
+    msg.textContent="Uygulaman için bir giriş şifresi oluştur.";
+    button.textContent="Şifre oluştur";
 
-      document.getElementById("lockMessage")
-        .textContent=
-        "İlk kurulum için sayfayı yenileyip şifre oluştur.";
-      return;
-    }
+    button.onclick=async()=>{
+      const password=input.value;
+      if(password.length<4){
+        alert("En az 4 karakterlik şifre gir.");
+        return;
+      }
 
-    const salt=crypto.randomUUID();
-
-    await setSetting({
-      key:"lock",
-      salt,
-      hash:await hashPassword(pass,salt)
-    });
-
-    unlocked=true;
+      const salt=uid();
+      const hash=await hashPassword(password,salt);
+      await setSetting({key:"lock",salt,hash});
+      overlay.classList.remove("visible");
+      await routeQR();
+    };
   }else{
-    document.getElementById("lockOverlay")
-      .classList.add("visible");
+    msg.textContent="Anı kutunu açmak için şifreni gir.";
+    button.textContent="Kilidi aç";
+
+    button.onclick=async()=>{
+      const hash=await hashPassword(input.value,existing.salt);
+      if(hash!==existing.hash){
+        alert("Şifre yanlış.");
+        return;
+      }
+
+      overlay.classList.remove("visible");
+      await routeQR();
+    };
   }
-}
 
-async function unlock(){
-  const saved=await getSetting("lock");
-  if(!saved)return;
-
-  const pass=document.getElementById(
-    "unlockPassword"
-  ).value;
-
-  const hash=await hashPassword(pass,saved.salt);
-
-  if(hash===saved.hash){
-    unlocked=true;
-
-    document.getElementById("lockOverlay")
-      .classList.remove("visible");
-
-    document.getElementById("unlockPassword").value="";
-    await routeQR();
-  }else{
-    document.getElementById("lockMessage")
-      .textContent="Şifre yanlış.";
-  }
+  input.onkeydown=e=>{
+    if(e.key==="Enter")button.click();
+  };
 }
 
 async function routeQR(){
-  if(!unlocked)return;
-
-  const id=new URLSearchParams(
-    location.search
-  ).get("id");
-
+  const id=new URLSearchParams(location.search).get("id");
   if(id){
-    const album=await getAlbum(id);
-
-    if(album){
-      await openAlbum(id);
-    }else{
-      alert(
-        "Bu albüm cihazında bulunamadı. Yedeğini geri yükle."
-      );
-    }
+    await openAlbum(id);
+  }else{
+    show("home");
   }
 }
 
@@ -1550,14 +1623,10 @@ async function routeQR(){
 async function init(){
   try{
     db=await openDB();
-    await renderAlbums();
     await setupLock();
-    await routeQR();
   }catch(e){
     console.error(e);
-    alert(
-      "Uygulama açılamadı. HTTPS üzerinden açmayı dene."
-    );
+    alert("Uygulama başlatılamadı: "+e.message);
   }
 }
 
