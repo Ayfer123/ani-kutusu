@@ -1,0 +1,680 @@
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR Anı Kutusu ♡</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --bg:#fff9f6;--pink:#bd7f9a;--dark:#765568;
+  --light:#fae8ef;--line:#ecd9e0;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--dark);font-family:Arial,sans-serif}
+main{max-width:510px;margin:auto;padding:22px 18px 100px}
+h1{font:normal 30px Georgia,serif;margin:15px 0}
+h2{font:normal 21px Georgia,serif}
+p{line-height:1.5}
+small,.muted{color:#a18b96}
+button{border:0;border-radius:12px;padding:12px 15px;font:inherit;cursor:pointer}
+button:disabled{opacity:.5}
+.primary{background:var(--pink);color:white}
+.soft{background:var(--light);color:var(--dark)}
+.danger{background:#fce2e4;color:#9c4555}
+input,select{
+ width:100%;border:1px solid var(--line);
+ border-radius:11px;padding:12px;margin:7px 0 14px;
+ background:white;font:inherit;color:var(--dark)
+}
+.card{
+ background:white;border:1px solid #f4e8ec;
+ border-radius:20px;padding:18px;margin:15px 0;
+ box-shadow:0 5px 18px #c999a615
+}
+.hero{
+ background:linear-gradient(135deg,#f7dce7,#fff0df);
+ border-radius:23px;padding:24px;margin:20px 0
+}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.stack{display:grid;gap:10px}
+.screen{display:none}
+.screen.active{display:block}
+.media-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.media{
+ position:relative;background:#fff2f6;border-radius:13px;
+ overflow:hidden;padding:6px
+}
+.media img,.media video{width:100%;height:155px;object-fit:cover;border-radius:9px}
+.media audio{width:100%}
+.media.audio{grid-column:1/-1;padding:14px}
+.media .delete{
+ position:absolute;top:9px;right:9px;
+ padding:5px 9px;background:white;color:#a64d70
+}
+.uploads{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}
+.uploads label{
+ background:var(--light);border-radius:13px;padding:16px 5px;
+ text-align:center;cursor:pointer;font-size:13px
+}
+.uploads label span{display:block;font-size:25px;margin-bottom:7px}
+.uploads input{display:none}
+.themes{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.theme{background:white;border:2px solid var(--line);padding:15px}
+.theme.selected{border-color:var(--pink);background:#fff0f5}
+.sticker{
+ width:20mm;height:20mm;position:relative;
+ display:flex;align-items:center;justify-content:center;
+ background:white;border:.25mm solid #cc98af;
+ overflow:hidden;flex-shrink:0
+}
+.sticker .qr{
+ width:17mm;height:17mm;
+ background:white;display:flex;
+ align-items:center;justify-content:center
+}
+.sticker .qr img,.sticker .qr canvas{
+ width:100%!important;height:100%!important;
+ image-rendering:pixelated
+}
+.sticker.floral{background:#fff1f5;border-color:#ce8eaa}
+.sticker.vintage{background:#faf1e5;border:.5mm double #b49a7d}
+.sticker.botanical{background:#f0f7ed;border-color:#88a18c}
+.sticker.pink{background:#fbe5ee;border-color:#cb91aa;border-radius:1.4mm}
+.sticker .ornament{
+ position:absolute;font-size:6px;line-height:1;
+ pointer-events:none
+}
+.sticker .one{left:1px;top:1px}
+.sticker .two{right:1px;bottom:1px}
+.preview{
+ background:white;min-height:150px;border-radius:18px;
+ display:flex;justify-content:center;align-items:center;margin:18px 0
+}
+.preview .sticker{transform:scale(3)}
+#printGrid{
+ display:grid;grid-template-columns:repeat(7,20mm);
+ gap:5mm;justify-content:center;
+ background:white;padding:10mm 0
+}
+nav{
+ position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+ width:100%;max-width:510px;background:white;
+ border-top:1px solid var(--line);
+ display:flex;justify-content:space-around;padding:12px
+}
+nav button{background:none;color:var(--pink)}
+.notice{padding:13px;background:#fff0e5;border-radius:12px;font-size:13px}
+#lockOverlay{
+ position:fixed;inset:0;background:#fff8f7;
+ z-index:100;display:none;align-items:center;justify-content:center;
+ padding:20px
+}
+#lockOverlay.visible{display:flex}
+#lockOverlay .card{width:100%;max-width:380px}
+@media print{
+ @page{size:A4;margin:10mm}
+ body{background:white}
+ main{max-width:none;padding:0}
+ header,nav,.no-print{display:none!important}
+ .screen{display:none!important}
+ #printScreen{display:block!important}
+ #printGrid{
+  padding:0;margin:0;
+  grid-template-columns:repeat(7,20mm);
+  gap:5mm;justify-content:start
+ }
+ .sticker{
+  print-color-adjust:exact;
+  -webkit-print-color-adjust:exact
+ }
+}
+</style>
+</head>
+<body>
+
+<div id="lockOverlay">
+ <div class="card">
+  <h1>♡ Anı Kutum</h1>
+  <p>Özel anılarını açmak için şifreni gir.</p>
+  <input type="password" id="unlockPassword" placeholder="Şifren">
+  <button class="primary" onclick="unlock()">Kilidi aç ♡</button>
+  <p class="muted" id="lockMessage"></p>
+ </div>
+</div>
+
+<main>
+<header class="row">
+ <strong style="font:25px Georgia;color:#ad708d">♡ anı kutum</strong>
+ <span>🌷</span>
+</header>
+
+<section id="home" class="screen active">
+ <h1>Benim küçük dünyam ♡</h1>
+ <p class="muted">Her karede bir anı saklı.</p>
+ <div class="hero">
+  <h2>Bugünden bir hatıra bırak...</h2>
+  <button class="primary" onclick="newAlbum()">+ Yeni albüm</button>
+ </div>
+ <div class="row">
+  <h2>Albümlerim</h2>
+  <button class="soft" onclick="openPrint()">▦ QR yazdır</button>
+ </div>
+ <div id="albumList"></div>
+ <div class="card">
+  <h2>♡ Anılarımı koru</h2>
+  <p class="muted">Telefon değiştirirken şifreli yedeğini kullan.</p>
+  <div class="stack">
+   <button class="soft" onclick="backup()">↓ Şifreli yedek oluştur</button>
+   <button class="soft" onclick="document.getElementById('restoreFile').click()">↑ Yedeği geri yükle</button>
+   <input id="restoreFile" type="file" accept=".json,application/json"
+     style="display:none" onchange="restoreBackup(this)">
+  </div>
+ </div>
+</section>
+
+<section id="createScreen" class="screen">
+ <button class="soft" onclick="show('home')">← Geri</button>
+ <h1>Yeni bir anı ♡</h1>
+ <label>Albüm adı</label>
+ <input id="albumTitle" placeholder="Unutulmaz bir gün">
+ <label>Tarih</label>
+ <input id="albumDate" type="date">
+ <button class="primary" onclick="createAlbum()">Albümü oluştur</button>
+</section>
+
+<section id="albumScreen" class="screen">
+ <button class="soft" onclick="show('home')">← Albümler</button>
+ <h1 id="currentTitle"></h1>
+ <p class="muted" id="currentDate"></p>
+ <div class="row">
+  <button class="soft" onclick="openQR()">▦ QR çıkartmam</button>
+  <button class="danger" onclick="deleteAlbum()">Albümü sil</button>
+ </div>
+ <div class="uploads">
+  <label><span>📷</span>Fotoğraf
+   <input type="file" accept="image/*" multiple onchange="upload(this,'image')">
+  </label>
+  <label><span>🎙️</span>Ses
+   <input type="file" accept="audio/*" multiple onchange="upload(this,'audio')">
+  </label>
+  <label><span>🎞️</span>Video
+   <input type="file" accept="video/*" multiple onchange="upload(this,'video')">
+  </label>
+ </div>
+ <div class="card"><h2>Fotoğraflar ♡</h2><div id="images" class="media-grid"></div></div>
+ <div class="card"><h2>Ses kayıtları ♡</h2><div id="audios" class="media-grid"></div></div>
+ <div class="card"><h2>Videolar ♡</h2><div id="videos" class="media-grid"></div></div>
+</section>
+
+<section id="qrScreen" class="screen">
+ <button class="soft" onclick="show('albumScreen')">← Albüme dön</button>
+ <h1>Minik QR çıkartmam ♡</h1>
+ <p class="muted">Çerçeve dâhil 2 × 2 cm.</p>
+ <div class="themes">
+  <button class="theme" data-theme="floral" onclick="changeTheme('floral')">🌸 Çiçekli</button>
+  <button class="theme" data-theme="vintage" onclick="changeTheme('vintage')">✧ Vintage</button>
+  <button class="theme" data-theme="botanical" onclick="changeTheme('botanical')">🍃 Botanik</button>
+  <button class="theme" data-theme="pink" onclick="changeTheme('pink')">♡ Pembe</button>
+ </div>
+ <div class="preview"><div id="qrPreview"></div></div>
+ <p class="muted">Önizleme büyütülmüştür. Baskı gerçek ölçüdedir.</p>
+ <button class="primary" onclick="downloadQR()">↓ PNG indir</button>
+</section>
+
+<section id="printScreen" class="screen">
+ <div class="no-print">
+  <button class="soft" onclick="show('home')">← Geri</button>
+  <h1>QR çıkartma sayfam ♡</h1>
+  <p class="muted">A4, %100 ölçek, her biri 20 × 20 mm.</p>
+  <button class="primary" onclick="window.print()">Yazdır ♡</button>
+ </div>
+ <div id="printGrid"></div>
+</section>
+
+<nav class="no-print">
+ <button onclick="show('home')">⌂ Albümler</button>
+ <button onclick="newAlbum()">＋ Yeni</button>
+ <button onclick="backup()">♡ Yedek</button>
+</nav>
+</main>
+
+<script>
+/*
+ QR ANİ KUTUSU
+ Uygulamayı yayımladıktan sonra buraya
+ sabit HTTPS adresini yaz.
+
+ Örnek:
+ const APP_URL="https://ornek.github.io/ani-kutusu/";
+*/
+const APP_URL="";
+
+/* VERİTABANI */
+const DB_NAME="qrAniKutusuDB";
+const STORE="albums";
+const META="settings";
+let db,active=null;
+let urls=[];
+let unlocked=false;
+
+function openDB(){
+ return new Promise((resolve,reject)=>{
+  const r=indexedDB.open(DB_NAME,2);
+  r.onupgradeneeded=()=>{
+   const d=r.result;
+   if(!d.objectStoreNames.contains(STORE))
+    d.createObjectStore(STORE,{keyPath:"id"});
+   if(!d.objectStoreNames.contains(META))
+    d.createObjectStore(META,{keyPath:"key"});
+  };
+  r.onsuccess=()=>resolve(r.result);
+  r.onerror=()=>reject(r.error);
+ });
+}
+function operation(name,mode,method,value){
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction(name,mode);
+  const r=tx.objectStore(name)[method](value);
+  r.onsuccess=()=>resolve(r.result);
+  r.onerror=()=>reject(r.error);
+ });
+}
+const allAlbums=()=>operation(STORE,"readonly","getAll");
+const getAlbum=id=>operation(STORE,"readonly","get",id);
+const saveAlbum=a=>operation(STORE,"readwrite","put",a);
+const eraseAlbum=id=>operation(STORE,"readwrite","delete",id);
+const getSetting=key=>operation(META,"readonly","get",key);
+const setSetting=obj=>operation(META,"readwrite","put",obj);
+
+function show(id){
+ document.querySelectorAll(".screen").forEach(s=>
+  s.classList.toggle("active",s.id===id)
+ );
+ window.scrollTo(0,0);
+ if(id==="home")renderAlbums();
+}
+function newAlbum(){
+ document.getElementById("albumTitle").value="";
+ const now=new Date();
+ document.getElementById("albumDate").value=
+  new Date(now-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
+ show("createScreen");
+}
+async function createAlbum(){
+ const title=document.getElementById("albumTitle").value.trim();
+ const date=document.getElementById("albumDate").value;
+ if(!title||!date)return alert("Albüm adı ve tarih gir.");
+ const album={
+  id:crypto.randomUUID(),title,date,
+  theme:"floral",media:[]
+ };
+ await saveAlbum(album);
+ await openAlbum(album.id);
+}
+async function renderAlbums(){
+ const area=document.getElementById("albumList");
+ const albums=await allAlbums();
+ albums.sort((a,b)=>b.date.localeCompare(a.date));
+ area.replaceChildren();
+ if(!albums.length){
+  area.innerHTML='<div class="card muted">Henüz albümün yok ♡</div>';
+  return;
+ }
+ for(const a of albums){
+  const card=document.createElement("div");
+  card.className="card";
+  const h=document.createElement("h2");
+  h.textContent="♡ "+a.title;
+  const date=document.createElement("p");
+  date.className="muted";date.textContent=a.date;
+  const btn=document.createElement("button");
+  btn.className="soft";btn.textContent="Albümü aç →";
+  btn.onclick=()=>openAlbum(a.id);
+  card.append(h,date,btn);
+  area.appendChild(card);
+ }
+}
+async function openAlbum(id){
+ active=await getAlbum(id);
+ if(!active)return alert("Bu albüm cihazında bulunamadı. Yedeğini geri yükle.");
+ show("albumScreen");
+ renderMedia();
+}
+function revokeUrls(){
+ urls.forEach(URL.revokeObjectURL);
+ urls=[];
+}
+function fileUrl(blob){
+ const u=URL.createObjectURL(blob);
+ urls.push(u);
+ return u;
+}
+function renderMedia(){
+ revokeUrls();
+ document.getElementById("currentTitle").textContent=active.title+" ♡";
+ document.getElementById("currentDate").textContent=active.date;
+ const areas={
+  image:document.getElementById("images"),
+  audio:document.getElementById("audios"),
+  video:document.getElementById("videos")
+ };
+ Object.values(areas).forEach(a=>a.replaceChildren());
+ for(const m of active.media){
+  const box=document.createElement("div");
+  box.className="media "+m.type;
+  const tag=m.type==="image"?"img":m.type==="audio"?"audio":"video";
+  const el=document.createElement(tag);
+  el.src=fileUrl(m.blob);
+  if(tag!=="img"){el.controls=true;el.playsInline=true}
+  const del=document.createElement("button");
+  del.className="delete";del.textContent="×";
+  del.onclick=()=>removeMedia(m.id);
+  box.append(el,del);
+  areas[m.type]?.append(box);
+ }
+}
+async function upload(input,type){
+ if(!active)return;
+ const selected=[...input.files];
+ for(const file of selected){
+  if(!file.type.startsWith(type+"/"))continue;
+  if(file.size>30*1024*1024){
+   alert(file.name+" çok büyük (30 MB sınırı).");
+   continue;
+  }
+  active.media.push({
+   id:crypto.randomUUID(),type,
+   name:file.name,blob:file
+  });
+ }
+ try{
+  await saveAlbum(active);
+  renderMedia();
+ }catch(e){
+  alert("Cihazda yeterli depolama alanı olmayabilir.");
+  active=await getAlbum(active.id);
+ }
+ input.value="";
+}
+async function removeMedia(id){
+ if(!confirm("Bu dosya silinsin mi?"))return;
+ active.media=active.media.filter(m=>m.id!==id);
+ await saveAlbum(active);
+ renderMedia();
+}
+async function deleteAlbum(){
+ if(!active||!confirm("Albüm ve içindeki dosyalar silinsin mi?"))return;
+ await eraseAlbum(active.id);
+ active=null;
+ show("home");
+}
+
+/* QR */
+function albumLink(id){
+ const base=APP_URL.trim()||location.href.split("?")[0].split("#")[0];
+ const url=new URL(base,location.href);
+ url.searchParams.set("id",id);
+ return url.href;
+}
+function sticker(a){
+ const el=document.createElement("div");
+ el.className="sticker "+(a.theme||"floral");
+ const qr=document.createElement("div");
+ qr.className="qr";
+ el.append(qr);
+ new QRCode(qr,{
+  text:albumLink(a.id),
+  width:320,height:320,
+  correctLevel:QRCode.CorrectLevel.M
+ });
+ const symbol={
+  floral:"✿",vintage:"✧",
+  botanical:"❧",pink:"♡"
+ }[a.theme||"floral"];
+ for(const cls of ["one","two"]){
+  const d=document.createElement("span");
+  d.className="ornament "+cls;
+  d.textContent=symbol;
+  el.append(d);
+ }
+ return el;
+}
+function openQR(){
+ if(!active)return;
+ show("qrScreen");
+ document.querySelectorAll(".theme").forEach(b=>
+  b.classList.toggle("selected",b.dataset.theme===(active.theme||"floral"))
+ );
+ const area=document.getElementById("qrPreview");
+ area.replaceChildren(sticker(active));
+}
+async function changeTheme(theme){
+ active.theme=theme;
+ await saveAlbum(active);
+ openQR();
+}
+function downloadQR(){
+ const st=document.querySelector("#qrPreview .sticker");
+ if(!st)return;
+ const source=st.querySelector(".qr canvas")||st.querySelector(".qr img");
+ if(!source)return;
+ const c=document.createElement("canvas");
+ c.width=600;c.height=600;
+ const ctx=c.getContext("2d");
+ const colors={
+  floral:"#fff1f5",vintage:"#faf1e5",
+  botanical:"#f0f7ed",pink:"#fbe5ee"
+ };
+ ctx.fillStyle=colors[active.theme||"floral"];
+ ctx.fillRect(0,0,600,600);
+ ctx.fillStyle="white";
+ ctx.fillRect(45,45,510,510);
+ ctx.imageSmoothingEnabled=false;
+ ctx.drawImage(source,45,45,510,510);
+ ctx.strokeStyle="#bc829b";
+ ctx.lineWidth=7;
+ ctx.strokeRect(4,4,592,592);
+ const a=document.createElement("a");
+ a.download="ani-qr.png";
+ a.href=c.toDataURL("image/png");
+ a.click();
+}
+async function openPrint(){
+ show("printScreen");
+ const area=document.getElementById("printGrid");
+ area.replaceChildren();
+ const albums=await allAlbums();
+ albums.forEach(a=>area.append(sticker(a)));
+}
+
+/* ŞİFRELİ YEDEKLEME */
+const enc=new TextEncoder();
+const dec=new TextDecoder();
+
+function bytesToBase64(bytes){
+ let s="";
+ for(let i=0;i<bytes.length;i+=8192){
+  s+=String.fromCharCode(...bytes.subarray(i,i+8192));
+ }
+ return btoa(s);
+}
+function base64ToBytes(s){
+ const raw=atob(s);
+ const arr=new Uint8Array(raw.length);
+ for(let i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i);
+ return arr;
+}
+async function deriveKey(password,salt){
+ const material=await crypto.subtle.importKey(
+  "raw",enc.encode(password),"PBKDF2",false,["deriveKey"]
+ );
+ return crypto.subtle.deriveKey(
+  {name:"PBKDF2",salt,iterations:250000,hash:"SHA-256"},
+  material,
+  {name:"AES-GCM",length:256},
+  false,["encrypt","decrypt"]
+ );
+}
+async function encryptText(text,password){
+ const salt=crypto.getRandomValues(new Uint8Array(16));
+ const iv=crypto.getRandomValues(new Uint8Array(12));
+ const key=await deriveKey(password,salt);
+ const encrypted=await crypto.subtle.encrypt(
+  {name:"AES-GCM",iv},key,enc.encode(text)
+ );
+ return {
+  version:1,
+  encryption:"AES-256-GCM",
+  salt:bytesToBase64(salt),
+  iv:bytesToBase64(iv),
+  data:bytesToBase64(new Uint8Array(encrypted))
+ };
+}
+async function decryptText(obj,password){
+ const salt=base64ToBytes(obj.salt);
+ const iv=base64ToBytes(obj.iv);
+ const key=await deriveKey(password,salt);
+ const decrypted=await crypto.subtle.decrypt(
+  {name:"AES-GCM",iv},key,base64ToBytes(obj.data)
+ );
+ return dec.decode(decrypted);
+}
+function downloadBlob(blob,name){
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement("a");
+ a.href=url;a.download=name;a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),10000);
+}
+async function backup(){
+ const password=prompt("Yedeği koruyacak güçlü bir şifre oluştur:");
+ if(!password)return;
+ if(password.length<10)return alert("En az 10 karakter kullan.");
+ const again=prompt("Şifreyi tekrar gir:");
+ if(password!==again)return alert("Şifreler eşleşmedi.");
+ try{
+  const albums=await allAlbums();
+  const result=[];
+  for(const a of albums){
+   const media=[];
+   for(const m of a.media){
+    const data=bytesToBase64(new Uint8Array(await m.blob.arrayBuffer()));
+    media.push({id:m.id,type:m.type,name:m.name,
+      mime:m.blob.type,data});
+   }
+   result.push({...a,media});
+  }
+  const encrypted=await encryptText(
+   JSON.stringify({format:"qr-ani-kutusu",version:1,albums:result}),
+   password
+  );
+  downloadBlob(
+   new Blob([JSON.stringify(encrypted)],{type:"application/json"}),
+   "ani-kutusu-sifreli-yedek.json"
+  );
+  alert("Yedek oluşturuldu. Dosyayı Google Drive'ına kendin yükleyebilirsin.");
+ }catch(e){
+  console.error(e);
+  alert("Yedek oluşturulamadı. Çok büyük videolar cihaz belleğini zorlayabilir.");
+ }
+}
+async function restoreBackup(input){
+ const file=input.files[0];
+ if(!file)return;
+ const password=prompt("Yedek şifreni gir:");
+ if(!password){input.value="";return}
+ try{
+  const encrypted=JSON.parse(await file.text());
+  const parsed=JSON.parse(await decryptText(encrypted,password));
+  if(parsed.format!=="qr-ani-kutusu"||!Array.isArray(parsed.albums))
+   throw Error("Geçersiz yedek");
+  if(!confirm("Yedekteki albümler bu cihaza aktarılsın mı? Aynı kimlikli albümler değiştirilecek."))
+   return;
+  for(const a of parsed.albums){
+   const media=[];
+   for(const m of a.media){
+    const bytes=base64ToBytes(m.data);
+    media.push({
+     id:m.id,type:m.type,name:m.name,
+     blob:new Blob([bytes],{type:m.mime})
+    });
+   }
+   await saveAlbum({...a,media});
+  }
+  alert("Anıların geri yüklendi ♡");
+  show("home");
+ }catch(e){
+  console.error(e);
+  alert("Şifre yanlış, dosya bozuk veya depolama alanı yetersiz.");
+ }finally{
+  input.value="";
+ }
+}
+
+/* UYGULAMA KİLİDİ
+ Bu kilit yalnızca basit bir ekran korumasıdır.
+ Tarayıcı depolamasını şifrelemez.
+*/
+async function hashPassword(password,salt){
+ const data=enc.encode(salt+password);
+ const hash=await crypto.subtle.digest("SHA-256",data);
+ return bytesToBase64(new Uint8Array(hash));
+}
+async function setupLock(){
+ const saved=await getSetting("lock");
+ if(!saved){
+  const pass=prompt("Anı Kutusu için bir ekran kilidi şifresi oluştur (en az 8 karakter):");
+  if(!pass||pass.length<8){
+   document.getElementById("lockOverlay").classList.add("visible");
+   document.getElementById("lockMessage").textContent=
+    "İlk kurulum için sayfayı yenileyip en az 8 karakterlik şifre oluştur.";
+   return;
+  }
+  const salt=crypto.randomUUID();
+  await setSetting({
+   key:"lock",salt,
+   hash:await hashPassword(pass,salt)
+  });
+  unlocked=true;
+ }else{
+  document.getElementById("lockOverlay").classList.add("visible");
+ }
+}
+async function unlock(){
+ const saved=await getSetting("lock");
+ if(!saved)return;
+ const pass=document.getElementById("unlockPassword").value;
+ if(await hashPassword(pass,saved.salt)===saved.hash){
+  unlocked=true;
+  document.getElementById("lockOverlay").classList.remove("visible");
+  document.getElementById("unlockPassword").value="";
+  await routeQR();
+ }else{
+  document.getElementById("lockMessage").textContent="Şifre yanlış.";
+ }
+}
+async function routeQR(){
+ if(!unlocked)return;
+ const id=new URLSearchParams(location.search).get("id");
+ if(id){
+  const album=await getAlbum(id);
+  if(album)await openAlbum(id);
+  else alert("Bu albüm cihazında yok. Yedeğini geri yükle.");
+ }
+}
+async function init(){
+ try{
+  db=await openDB();
+  await renderAlbums();
+  await setupLock();
+  await routeQR();
+ }catch(e){
+  console.error(e);
+  alert("Uygulama açılamadı. HTTPS üzerinden çalıştırmayı dene.");
+ }
+}
+init();
+</script>
+</body>
+</html>
