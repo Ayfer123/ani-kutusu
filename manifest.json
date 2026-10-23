@@ -1,0 +1,26 @@
+
+{
+  "name": "QR Anı Kutusu",
+  "short_name": "Anı Kutusu",
+  "description": "QR kodlarla kişisel anı albümü",
+  "lang": "tr",
+  "start_url": "/ani-kutusu/",
+  "scope": "/ani-kutusu/",
+  "display": "standalone",
+  "background_color": "#faf5f7",
+  "theme_color": "#ba8ba2",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
