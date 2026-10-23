@@ -3,7 +3,7 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#faf5f7">
 <title>QR Anı Kutusu ♡</title>
 
@@ -11,241 +11,171 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-:root {
-  --bg:#faf6f8;
-  --surface:#fff;
-  --pink:#bd8da4;
-  --pink-light:#f4e6ed;
-  --ink:#574450;
-  --muted:#9c8893;
-  --line:#ecdee5;
-  --danger:#b85d70;
+:root{
+  --bg:#faf5f7;
+  --paper:#fff;
+  --pink:#ba8ba2;
+  --soft:#f3e5ec;
+  --ink:#594652;
+  --muted:#9d8995;
+  --line:#eadce4;
+  --red:#b75c71;
 }
-* {box-sizing:border-box}
-body {
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
   font-family:system-ui,-apple-system,Arial,sans-serif;
 }
-button,input,select {font:inherit}
-button {cursor:pointer}
-button:disabled {opacity:.45;cursor:not-allowed}
-header {
-  position:sticky;
-  top:0;
-  z-index:10;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:13px 17px;
-  background:#faf6f8ee;
-  backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--line);
+button,input{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+header{
+  position:sticky;top:0;z-index:10;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:13px 16px;background:#faf5f7ef;
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
 }
-.logo {font:26px Georgia,serif}
-.logo span {color:var(--pink)}
-main {max-width:780px;margin:auto;padding:18px}
-h1 {font:32px Georgia,serif;margin:12px 0}
-h2 {font:23px Georgia,serif;margin:0 0 12px}
-p {line-height:1.55}
-small,.muted {color:var(--muted)}
-.card {
-  background:var(--surface);
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:17px;
-  margin-bottom:14px;
+.logo{font:25px Georgia,serif}
+.logo span{color:var(--pink)}
+main{max-width:780px;margin:auto;padding:17px}
+h1{font:31px Georgia,serif;margin:12px 0}
+h2{font:23px Georgia,serif;margin:0 0 12px}
+h3{font-size:14px;margin:18px 0 9px}
+p{line-height:1.5}
+small,.muted{color:var(--muted)}
+.card{
+  background:var(--paper);border:1px solid var(--line);
+  border-radius:17px;padding:17px;margin-bottom:14px;
 }
-.btn {
-  padding:11px 14px;
-  background:#fff;
-  color:var(--ink);
-  border:1px solid var(--line);
-  border-radius:12px;
+.btn{
+  background:#fff;color:var(--ink);border:1px solid var(--line);
+  padding:11px 13px;border-radius:11px;
 }
-.btn.primary {background:var(--pink);color:#fff;border-color:var(--pink)}
-.btn.danger {color:var(--danger)}
-.btn.active {background:var(--pink-light);border-color:var(--pink)}
-.row {display:flex;align-items:center;gap:9px;flex-wrap:wrap}
-.between {justify-content:space-between}
-.full {width:100%}
-.screen {display:none}
-.screen.show {display:block}
-label {display:block;font-size:13px;margin:13px 0 6px}
-input[type=text],
-input[type=date],
-input[type=password],
-input[type=number],
-select {
-  width:100%;
-  padding:12px;
-  color:var(--ink);
-  background:white;
-  border:1px solid var(--line);
-  border-radius:11px;
+.btn.primary{background:var(--pink);border-color:var(--pink);color:white}
+.btn.danger{color:var(--red)}
+.btn.active{background:var(--soft);border-color:var(--pink)}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.between{justify-content:space-between}
+.full{width:100%}
+.screen{display:none}
+.screen.show{display:block}
+label{display:block;font-size:13px;margin:13px 0 6px}
+input[type=text],input[type=date],input[type=password]{
+  width:100%;padding:12px;border:1px solid var(--line);
+  border-radius:11px;color:var(--ink);background:white;
 }
-input[type=range] {width:100%;accent-color:var(--pink)}
-.album-grid {
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+input[type=range]{width:100%;accent-color:var(--pink)}
+.album-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));
   gap:12px;
 }
-.album-tile {
-  display:block;
-  width:100%;
-  padding:17px;
-  text-align:left;
-  background:white;
-  border:1px solid var(--line);
-  border-radius:15px;
-  color:var(--ink);
+.album-tile{
+  width:100%;background:white;text-align:left;
+  border:1px solid var(--line);border-radius:15px;
+  padding:16px;color:var(--ink);
 }
-.album-tile .emoji {font-size:29px;margin-bottom:12px}
-.album-tile strong {display:block;overflow-wrap:anywhere}
-.album-tile small {display:block;margin-top:8px}
-.media-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.media-card {
-  position:relative;
-  overflow:hidden;
-  border-radius:13px;
-  background:#f1e8ed;
-  min-height:70px;
+.album-tile strong{display:block;overflow-wrap:anywhere}
+.album-tile small{display:block;margin-top:8px}
+.album-icon{font-size:29px;margin-bottom:10px}
+.media-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.media-card{
+  position:relative;overflow:hidden;background:#f2e9ee;
+  border-radius:12px;min-height:65px;
 }
-.media-card img,.media-card video {width:100%;display:block}
-.media-card audio {width:100%;margin-top:35px}
-.media-card .delete-media {position:absolute;right:6px;top:6px}
-.selection-list {display:grid;gap:8px}
-.selection-item {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:12px;
-  border:1px solid var(--line);
-  border-radius:12px;
-  background:#fdfafb;
+.media-card img,.media-card video{width:100%;display:block}
+.media-card audio{width:100%;margin-top:38px}
+.media-card .remove{position:absolute;right:5px;top:5px}
+.tabs{display:flex;gap:7px;overflow-x:auto;padding-bottom:10px}
+.tab{
+  border:1px solid var(--line);background:white;
+  border-radius:11px;padding:10px 12px;white-space:nowrap;
 }
-.selection-item input {width:18px;height:18px;accent-color:var(--pink)}
-.selection-item span {flex:1;overflow-wrap:anywhere}
-.studio-shell {
-  background:#f0e8ec;
-  border-radius:18px;
-  padding:16px 10px;
-  margin:14px 0;
+.tab.active{background:var(--soft);border-color:var(--pink)}
+.studio-shell{
+  background:#f0e8ec;border-radius:17px;
+  padding:15px 8px;margin:14px 0;
 }
-.studio-board {
-  width:300px;
-  height:300px;
-  max-width:100%;
-  aspect-ratio:1;
-  position:relative;
-  margin:auto;
+.studio-board{
+  width:300px;height:300px;max-width:100%;
+  aspect-ratio:1;margin:auto;position:relative;
   touch-action:none;
 }
-.studio-qr {
+.studio-qr{
   position:absolute;
-  left:14%;
-  top:14%;
-  width:72%;
-  height:72%;
+  left:9%;top:9%;
+  width:82%;height:82%;
+  padding:3px;
   background:#fff;
-  padding:5px;
   pointer-events:none;
 }
-.studio-qr img,.studio-qr canvas {
-  width:100%!important;
-  height:100%!important;
-  display:block;
+.studio-qr img,.studio-qr canvas{
+  width:100%!important;height:100%!important;display:block;
 }
-.studio-piece {
-  position:absolute;
-  transform:translate(-50%,-50%);
-  user-select:none;
-  touch-action:none;
-  cursor:grab;
-  line-height:1;
+.studio-piece{
+  position:absolute;transform:translate(-50%,-50%);
+  cursor:grab;touch-action:none;user-select:none;line-height:1;
 }
-.studio-piece.selected {
-  outline:5px dashed var(--pink);
-  outline-offset:1px;
+.studio-piece.selected{
+  outline:1px dashed var(--pink);outline-offset:4px;
 }
-.tabs {display:flex;gap:7px;overflow-x:auto;padding-bottom:10px}
-.tab {
-  white-space:nowrap;
-  background:#fff;
-  border:1px solid var(--line);
-  padding:10px 12px;
-  border-radius:11px;
-  font-size:13px;
+.studio-panel{
+  background:white;border:1px solid var(--line);
+  border-radius:15px;padding:15px;
 }
-.tab.active {background:var(--pink-light);border-color:var(--pink)}
-.studio-panel {
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:15px;
-  padding:16px;
+.symbol-grid{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:7px;
 }
-.symbol-grid {display:grid;grid-template-columns:repeat(6,1fr);gap:7px}
-.symbol {
-  min-height:48px;
-  font-size:25px;
-  background:#fdfafb;
-  color:#ad7f95;
-  border:1px solid var(--line);
-  border-radius:10px;
+.symbol{
+  min-height:48px;border:1px solid var(--line);
+  background:#fdfafb;border-radius:10px;
+  font-size:24px;color:#ab8195;
 }
-.palette {display:flex;flex-wrap:wrap;gap:11px;margin:12px 0}
-.swatch {
-  width:36px;height:36px;
-  border-radius:50%;
-  border:3px solid white;
-  box-shadow:0 0 0 1px #d8cbd1;
+.palette{display:flex;flex-wrap:wrap;gap:11px;margin:12px 0}
+.swatch{
+  width:36px;height:36px;border-radius:50%;
+  border:3px solid white;box-shadow:0 0 0 1px #d7c8d0;
 }
-.swatch.active {box-shadow:0 0 0 2px #614a57}
-.preview {
-  display:flex;
-  justify-content:center;
-  align-items:center;
+.swatch.active{box-shadow:0 0 0 2px #594652}
+.selection-list{display:grid;gap:8px}
+.selection-item{
+  display:flex;align-items:center;gap:12px;
+  border:1px solid var(--line);border-radius:12px;
+  padding:12px;background:#fdfafb;
+}
+.selection-item input{
+  width:18px;height:18px;accent-color:var(--pink);
+}
+.selection-item span{flex:1;overflow-wrap:anywhere}
+#qrPreview{
+  display:flex;justify-content:center;
   padding:20px;
 }
-.preview img {width:240px;height:240px;object-fit:contain}
-#lockOverlay {
-  position:fixed;
-  inset:0;
-  z-index:100;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-  background:var(--bg);
+#qrPreview img{width:260px;height:260px;object-fit:contain}
+#lockOverlay{
+  position:fixed;inset:0;z-index:100;
+  display:none;align-items:center;justify-content:center;
+  background:var(--bg);padding:20px;
 }
-#lockOverlay.visible {display:flex}
-.lock-card {
-  width:100%;
-  max-width:360px;
-  background:white;
-  padding:24px;
-  border:1px solid var(--line);
+#lockOverlay.visible{display:flex}
+.lock-card{
+  width:100%;max-width:360px;padding:24px;
+  background:white;border:1px solid var(--line);
   border-radius:20px;
 }
-@media(max-width:480px) {
-  .studio-board {width:270px;height:270px}
-  .symbol-grid {grid-template-columns:repeat(5,1fr)}
-  .media-grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:480px){
+  .studio-board{width:270px;height:270px}
+  .symbol-grid{grid-template-columns:repeat(5,1fr)}
 }
 </style>
 </head>
 
 <body>
-
 <header>
   <div class="logo">anı kutusu <span>♡</span></div>
   <button class="btn" onclick="show('home')">⌂ Albümler</button>
 </header>
 
 <main>
-
-<!-- ANA SAYFA -->
 <section id="home" class="screen show">
   <div class="row between">
     <div>
@@ -255,44 +185,36 @@ input[type=range] {width:100%;accent-color:var(--pink)}
     <button class="btn primary" onclick="newAlbum()">+ Albüm</button>
   </div>
 
-  <div style="height:18px"></div>
+  <div style="height:17px"></div>
   <div id="albumList" class="album-grid"></div>
 
   <div class="card" style="margin-top:18px">
     <h2>QR Baskı Merkezi</h2>
     <p class="muted">
-      Albümlerinin QR çıkartmalarını A4 PDF olarak hazırla.
-      Her çıkartma 2 × 2 cm.
+      2 × 2 cm çıkartmalarını A4 PDF olarak hazırla.
     </p>
     <div class="row">
-      <button class="btn primary" onclick="openSelection()">
-        ☑ QR'ları seç
-      </button>
-      <button class="btn" onclick="exportAllPDF()">
-        ↓ Tüm QR'ları A4 PDF indir
-      </button>
+      <button class="btn primary" onclick="openSelection()">☑ QR'ları seç</button>
+      <button class="btn" onclick="exportAllPDF()">↓ Tüm QR'ları PDF indir</button>
     </div>
   </div>
 
   <div class="card">
     <h2>Yedekleme</h2>
     <p class="muted">
-      Anıların bu tarayıcıda saklanır. Başka telefona geçmeden
-      önce şifreli yedek indir.
+      Anıların bu tarayıcıda saklanır. Telefon değiştirmeden
+      önce şifreli yedek al.
     </p>
     <div class="row">
       <button class="btn" onclick="backup()">↓ Şifreli yedek al</button>
-      <button class="btn" onclick="$('restoreFile').click()">
-        ↑ Yedek yükle
-      </button>
-      <input id="restoreFile" type="file"
-             accept=".json,application/json" hidden
+      <button class="btn" onclick="$('restoreFile').click()">↑ Yedek yükle</button>
+      <input id="restoreFile" type="file" hidden
+             accept=".json,application/json"
              onchange="restoreBackup(this.files[0]);this.value=''">
     </div>
   </div>
 </section>
 
-<!-- YENİ ALBÜM -->
 <section id="createScreen" class="screen">
   <button class="btn" onclick="show('home')">← Geri</button>
   <div class="card" style="margin-top:15px">
@@ -306,7 +228,6 @@ input[type=range] {width:100%;accent-color:var(--pink)}
   </div>
 </section>
 
-<!-- ALBÜM -->
 <section id="albumScreen" class="screen">
   <button class="btn" onclick="show('home')">← Albümler</button>
   <div class="card" style="margin-top:15px">
@@ -317,19 +238,16 @@ input[type=range] {width:100%;accent-color:var(--pink)}
         + Fotoğraf / video / ses
       </button>
       <button class="btn" onclick="openStudio()">✿ QR tasarla</button>
-      <button class="btn" onclick="exportCurrentPDF()">
-        ↓ Bu QR'ı A4 PDF indir
-      </button>
+      <button class="btn" onclick="exportCurrentPDF()">↓ Bu QR'ı PDF indir</button>
       <button class="btn danger" onclick="deleteAlbum()">Albümü sil</button>
     </div>
-    <input id="mediaInput" type="file" multiple
-           accept="image/*,video/*,audio/*" hidden
+    <input id="mediaInput" type="file" hidden multiple
+           accept="image/*,video/*,audio/*"
            onchange="upload(this.files);this.value=''">
   </div>
   <div id="mediaList" class="media-grid"></div>
 </section>
 
-<!-- QR TASARIM ATÖLYESİ -->
 <section id="studioScreen" class="screen">
   <div class="row between">
     <button class="btn" onclick="openAlbum(currentAlbumId)">← Albüme dön</button>
@@ -340,11 +258,13 @@ input[type=range] {width:100%;accent-color:var(--pink)}
   </div>
 
   <h1>anı atölyesi ✿</h1>
-  <p class="muted">Süslemeleri seç, sürükle ve ayrı ayrı renklendir.</p>
+  <p class="muted">
+    QR büyütüldü. Süslemeleri kenarlarda konumlandırabilirsin.
+  </p>
 
   <div class="studio-shell">
     <div class="row between"
-         style="font-size:11px;color:#9c8893;margin:0 8px 13px">
+         style="font-size:11px;color:#9c8893;margin:0 8px 12px">
       <span>ŞEFFAF TASARIM ALANI</span>
       <span>20 × 20 mm</span>
     </div>
@@ -356,43 +276,32 @@ input[type=range] {width:100%;accent-color:var(--pink)}
       <div id="studioQR" class="studio-qr"></div>
       <div id="studioPieces" style="position:absolute;inset:0"></div>
     </div>
-
-    <p class="muted" style="font-size:11px;text-align:center;margin:15px 0 0">
-      QR ortada kalır · Süslemeler kenarlarda hareket eder
-    </p>
   </div>
 
   <div class="tabs">
-    <button class="tab active" data-tab="decor" onclick="setStudioTab('decor')">
-      ✿ Süslemeler
-    </button>
-    <button class="tab" data-tab="color" onclick="setStudioTab('color')">
-      ◉ Renkler
-    </button>
-    <button class="tab" data-tab="edit" onclick="setStudioTab('edit')">
-      ⚙ Düzenle
-    </button>
-    <button class="tab" data-tab="frame" onclick="setStudioTab('frame')">
-      ▢ Çerçeve
-    </button>
+    <button class="tab active" data-tab="decor"
+            onclick="setStudioTab('decor')">✿ Süslemeler</button>
+    <button class="tab" data-tab="color"
+            onclick="setStudioTab('color')">◉ Renkler</button>
+    <button class="tab" data-tab="edit"
+            onclick="setStudioTab('edit')">⚙ Düzenle</button>
+    <button class="tab" data-tab="frame"
+            onclick="setStudioTab('frame')">▢ Çerçeve</button>
   </div>
 
   <div id="studioPanel" class="studio-panel"></div>
 
   <div class="row" style="margin-top:14px">
-    <button class="btn primary" onclick="saveDesign()">
-      ✓ Tasarımı kaydet
-    </button>
+    <button class="btn primary" onclick="saveDesign()">✓ Tasarımı kaydet</button>
     <button class="btn" onclick="openQR()">QR önizlemesi</button>
   </div>
 </section>
 
-<!-- QR ÖNİZLEME -->
 <section id="qrScreen" class="screen">
   <button class="btn" onclick="openStudio()">← Tasarıma dön</button>
   <h1>QR çıkartman ♡</h1>
-  <p class="muted">Baskıda tamamı 2 × 2 cm olacak.</p>
-  <div id="qrPreview" class="preview"></div>
+  <p class="muted">Toplam boyut 20 × 20 mm, QR yaklaşık 16 mm.</p>
+  <div id="qrPreview"></div>
   <div class="row">
     <button class="btn primary" onclick="downloadQR()">↓ PNG indir</button>
     <button class="btn" onclick="exportCurrentPDF()">↓ A4 PDF indir</button>
@@ -400,35 +309,25 @@ input[type=range] {width:100%;accent-color:var(--pink)}
   </div>
 </section>
 
-<!-- QR SEÇİMİ -->
 <section id="selectionScreen" class="screen">
   <button class="btn" onclick="show('home')">← Albümler</button>
   <h1>QR Baskı Merkezi ♡</h1>
-  <p class="muted">
-    A4 PDF'ye eklemek istediğin albümleri işaretle.
-  </p>
+  <p class="muted">A4 sayfasına eklemek istediğin albümleri seç.</p>
 
   <div class="card">
     <div class="row between" style="margin-bottom:15px">
       <strong id="selectionCount">0 albüm seçildi</strong>
       <button class="btn" onclick="toggleAllSelections()">Tümünü seç</button>
     </div>
-
     <div id="selectionList" class="selection-list"></div>
   </div>
 
   <div class="card">
-    <div class="row between">
-      <span>Sayfa boyutu</span><strong>A4</strong>
-    </div>
+    <div class="row between"><span>Sayfa</span><strong>A4</strong></div>
     <hr style="border:0;border-top:1px solid var(--line);margin:13px 0">
-    <div class="row between">
-      <span>Çıkartma boyutu</span><strong>20 × 20 mm</strong>
-    </div>
+    <div class="row between"><span>Çıkartma</span><strong>20 × 20 mm</strong></div>
     <hr style="border:0;border-top:1px solid var(--line);margin:13px 0">
-    <div class="row between">
-      <span>Bir sayfadaki kapasite</span><strong>70 QR</strong>
-    </div>
+    <div class="row between"><span>Sayfa kapasitesi</span><strong>70 QR</strong></div>
     <button id="selectedPDFButton" class="btn primary full"
             style="margin-top:18px"
             onclick="exportSelectedPDF()">
@@ -436,10 +335,8 @@ input[type=range] {width:100%;accent-color:var(--pink)}
     </button>
   </div>
 </section>
-
 </main>
 
-<!-- ŞİFRE -->
 <div id="lockOverlay">
   <div class="lock-card">
     <h1>anı kutusu ♡</h1>
@@ -467,9 +364,9 @@ let design=null;
 let selectedPiece=null;
 let studioTab="decor";
 let history=[];
-let selectionIds=new Set();
 let selectionAlbums=[];
-let qrCache=new Map();
+let selectionIds=new Set();
+const qrCache=new Map();
 
 const PALETTE=[
   "#d79bab","#b58ac5","#8ea88d","#9ab9d4",
@@ -488,7 +385,7 @@ const DECORATIONS={
 
 function show(id){
   document.querySelectorAll(".screen")
-    .forEach(e=>e.classList.remove("show"));
+    .forEach(el=>el.classList.remove("show"));
   $(id).classList.add("show");
   window.scrollTo(0,0);
   if(id==="home")renderAlbums();
@@ -526,7 +423,7 @@ const getSetting=k=>operation("settings","readonly",s=>s.get(k));
 const setSetting=v=>operation("settings","readwrite",s=>s.put(v));
 
 function defaultDesign(){
-  return {
+  return{
     frame:"solid",
     frameColor:"#d79bab",
     frameWidth:0.05,
@@ -534,13 +431,13 @@ function defaultDesign(){
   };
 }
 
-function normalizeDesign(value){
-  if(!value||typeof value!=="object")return defaultDesign();
-  return {
-    frame:value.frame||"solid",
-    frameColor:value.frameColor||"#d79bab",
-    frameWidth:Number(value.frameWidth)||0.05,
-    pieces:Array.isArray(value.pieces)?value.pieces:[]
+function normalizeDesign(v){
+  if(!v||typeof v!=="object")return defaultDesign();
+  return{
+    frame:v.frame||"solid",
+    frameColor:v.frameColor||"#d79bab",
+    frameWidth:Number(v.frameWidth)||0.05,
+    pieces:Array.isArray(v.pieces)?v.pieces:[]
   };
 }
 
@@ -553,6 +450,7 @@ function newAlbum(){
 async function createAlbum(){
   const title=$("albumTitle").value.trim();
   if(!title)return alert("Önce albüm adı yaz.");
+
   const a={
     id:uid(),
     title,
@@ -561,17 +459,21 @@ async function createAlbum(){
     media:[],
     design:defaultDesign()
   };
+
   await saveAlbum(a);
   await openAlbum(a.id);
 }
 
 async function renderAlbums(){
   const albums=await allAlbums();
-  const list=$("albumList");
-  list.replaceChildren();
+  const box=$("albumList");
+  box.replaceChildren();
 
   if(!albums.length){
-    list.innerHTML='<p class="muted">Henüz albümün yok ♡</p>';
+    const p=document.createElement("p");
+    p.className="muted";
+    p.textContent="Henüz albümün yok ♡";
+    box.append(p);
     return;
   }
 
@@ -582,7 +484,7 @@ async function renderAlbums(){
     b.className="album-tile";
 
     const icon=document.createElement("div");
-    icon.className="emoji";
+    icon.className="album-icon";
     icon.textContent="♡";
 
     const title=document.createElement("strong");
@@ -593,7 +495,7 @@ async function renderAlbums(){
 
     b.append(icon,title,date);
     b.onclick=()=>openAlbum(a.id);
-    list.append(b);
+    box.append(b);
   }
 }
 
@@ -611,9 +513,10 @@ function fileUrl(blob){
 async function openAlbum(id){
   const a=await getAlbum(id);
   if(!a){
-    alert("Bu albüm bu cihazda bulunamadı. Yedeğini geri yüklemen gerekebilir.");
+    alert("Bu albüm bu cihazda bulunamadı.");
     return;
   }
+
   currentAlbumId=id;
   currentAlbum=a;
   $("openAlbumTitle").textContent=a.title;
@@ -646,7 +549,7 @@ function renderMedia(){
     }
 
     const del=document.createElement("button");
-    del.className="btn danger delete-media";
+    del.className="btn danger remove";
     del.textContent="🗑";
     del.onclick=()=>removeMedia(m.id);
 
@@ -663,10 +566,7 @@ async function upload(files){
   for(const f of files){
     if(!/^(image|video|audio)\//.test(f.type))continue;
     a.media.push({
-      id:uid(),
-      type:f.type,
-      name:f.name,
-      blob:f
+      id:uid(),type:f.type,name:f.name,blob:f
     });
   }
 
@@ -685,7 +585,7 @@ async function removeMedia(id){
 }
 
 async function deleteAlbum(){
-  if(!confirm("Bu albüm ve içindeki dosyalar silinsin mi?"))return;
+  if(!confirm("Albüm ve içindeki dosyalar silinsin mi?"))return;
   await eraseAlbum(currentAlbumId);
   currentAlbumId=null;
   currentAlbum=null;
@@ -696,13 +596,13 @@ function albumLink(id){
   return APP_URL+"?id="+encodeURIComponent(id);
 }
 
-/* QR OLUŞTURMA */
+/* QR KODU */
 
 async function qrData(id){
   if(qrCache.has(id))return qrCache.get(id);
 
   if(typeof QRCode==="undefined")
-    throw Error("QR kütüphanesi yüklenemedi. İnternet bağlantını kontrol et.");
+    throw Error("QR kütüphanesi yüklenemedi.");
 
   const holder=document.createElement("div");
   holder.style.cssText=
@@ -714,23 +614,23 @@ async function qrData(id){
       text:albumLink(id),
       width:512,
       height:512,
-      correctLevel:QRCode.CorrectLevel.H,
       colorDark:"#000000",
-      colorLight:"#ffffff"
+      colorLight:"#ffffff",
+      correctLevel:QRCode.CorrectLevel.H
     });
 
     await new Promise(r=>setTimeout(r,100));
 
     const canvas=holder.querySelector("canvas");
     const img=holder.querySelector("img");
-    let data;
 
-    if(canvas)data=canvas.toDataURL("image/png");
-    else if(img?.src)data=img.src;
+    let result;
+    if(canvas)result=canvas.toDataURL("image/png");
+    else if(img?.src)result=img.src;
     else throw Error("QR oluşturulamadı.");
 
-    qrCache.set(id,data);
-    return data;
+    qrCache.set(id,result);
+    return result;
   }finally{
     holder.remove();
   }
@@ -740,12 +640,14 @@ async function qrData(id){
 
 async function openStudio(){
   if(!currentAlbumId)return;
+
   const a=await getAlbum(currentAlbumId);
   currentAlbum=a;
   design=normalizeDesign(a.design);
   selectedPiece=null;
   history=[];
   studioTab="decor";
+
   show("studioScreen");
 
   $("studioQR").replaceChildren();
@@ -755,7 +657,7 @@ async function openStudio(){
   $("studioQR").append(img);
 
   renderStudio();
-  renderStudioPanel();
+  setStudioTab("decor");
 }
 
 function rememberDesign(){
@@ -773,50 +675,55 @@ function undoDesign(){
 }
 
 function getSelected(){
-  return design.pieces.find(p=>p.id===selectedPiece);
+  return design?.pieces.find(p=>p.id===selectedPiece);
 }
 
-/* QR koruma alanı: figür merkezlerini dış kenarlarda tut */
-function safePosition(x,y,size=18){
-  x=Math.max(5,Math.min(95,x));
-  y=Math.max(5,Math.min(95,y));
+/*
+  QR 9%-91% aralığında.
+  Figür merkezleri kenarda tutulur.
+*/
+function safePosition(x,y,size=20){
+  x=Math.max(3,Math.min(97,x));
+  y=Math.max(3,Math.min(97,y));
 
-  const margin=Math.min(8,size/6);
-  const lo=14-margin;
-  const hi=86+margin;
+  const lo=9;
+  const hi=91;
 
   if(x>lo&&x<hi&&y>lo&&y<hi){
-    const distances=[
+    const edges=[
       {d:x-lo,axis:"x",v:lo},
       {d:hi-x,axis:"x",v:hi},
       {d:y-lo,axis:"y",v:lo},
       {d:hi-y,axis:"y",v:hi}
     ].sort((a,b)=>a.d-b.d);
-    const edge=distances[0];
-    if(edge.axis==="x")x=edge.v;
-    else y=edge.v;
+
+    if(edges[0].axis==="x")x=edges[0].v;
+    else y=edges[0].v;
   }
 
-  return {x,y};
+  return{x,y};
 }
 
 function addDecoration(symbol){
   rememberDesign();
-  const positions=[
-    [7,7],[93,7],[7,93],[93,93],
-    [50,7],[50,93],[7,50],[93,50]
+
+  const spots=[
+    [5,5],[95,5],[5,95],[95,95],
+    [50,5],[50,95],[5,50],[95,50]
   ];
-  const i=design.pieces.length%positions.length;
+  const i=design.pieces.length%spots.length;
+
   const p={
     id:uid(),
     symbol,
-    x:positions[i][0],
-    y:positions[i][1],
-    size:20,
+    x:spots[i][0],
+    y:spots[i][1],
+    size:18,
     rotation:0,
     color:"#d79bab",
     opacity:1
   };
+
   design.pieces.push(p);
   selectedPiece=p.id;
   renderStudio();
@@ -825,9 +732,9 @@ function addDecoration(symbol){
 
 function renderStudio(){
   const frame=$("studioFrame");
-  const pieces=$("studioPieces");
+  const box=$("studioPieces");
   frame.replaceChildren();
-  pieces.replaceChildren();
+  box.replaceChildren();
 
   if(design.frame!=="none"){
     const rect=document.createElementNS(
@@ -837,14 +744,16 @@ function renderStudio(){
     rect.setAttribute("y","2");
     rect.setAttribute("width","296");
     rect.setAttribute("height","296");
-    rect.setAttribute("rx",design.frame==="rounded"?"25":"0");
+    rect.setAttribute("rx",design.frame==="rounded"?"24":"0");
     rect.setAttribute("fill","none");
     rect.setAttribute("stroke",design.frameColor);
-    rect.setAttribute("stroke-width",design.frameWidth*300/20);
+    rect.setAttribute("stroke-width",design.frameWidth*15);
+
     if(design.frame==="dashed")
       rect.setAttribute("stroke-dasharray","8 5");
     if(design.frame==="dotted")
       rect.setAttribute("stroke-dasharray","1 5");
+
     frame.append(rect);
   }
 
@@ -866,6 +775,7 @@ function renderStudio(){
       e.stopPropagation();
       selectedPiece=p.id;
       rememberDesign();
+
       el.setPointerCapture(e.pointerId);
       renderStudioPanel();
 
@@ -892,7 +802,7 @@ function renderStudio(){
       el.addEventListener("pointercancel",end);
     });
 
-    pieces.append(el);
+    box.append(el);
   }
 }
 
@@ -908,9 +818,10 @@ function removeSelected(){
 function duplicateSelected(){
   const p=getSelected();
   if(!p)return;
+
   rememberDesign();
   const copy={...p,id:uid()};
-  const pos=safePosition(p.x+5,p.y+5,p.size);
+  const pos=safePosition(p.x+4,p.y+4,p.size);
   copy.x=pos.x;
   copy.y=pos.y;
   design.pieces.push(copy);
@@ -950,7 +861,6 @@ function renderStudioPanel(){
     for(const [group,symbols] of Object.entries(DECORATIONS)){
       const h=document.createElement("h3");
       h.textContent=group;
-      h.style.fontSize="14px";
       panel.append(h);
 
       const grid=document.createElement("div");
@@ -963,6 +873,7 @@ function renderStudioPanel(){
         b.onclick=()=>addDecoration(symbol);
         grid.append(b);
       }
+
       panel.append(grid);
     }
     return;
@@ -972,7 +883,7 @@ function renderStudioPanel(){
     const p=getSelected();
 
     if(!p){
-      panel.append(panelText("Önce rengini değiştirmek istediğin süslemeye dokun."));
+      panel.append(panelText("Önce rengini değiştirmek istediğin süslemeyi seç."));
       return;
     }
 
@@ -988,6 +899,7 @@ function renderStudioPanel(){
       b.className="swatch"+(p.color===color?" active":"");
       b.style.background=color;
       b.title=color;
+
       b.onclick=()=>{
         rememberDesign();
         p.color=color;
@@ -1000,15 +912,19 @@ function renderStudioPanel(){
     panel.append(palette);
 
     const lab=document.createElement("label");
-    lab.textContent="Özel renk seç";
+    lab.textContent="Özel renk";
+
     const picker=document.createElement("input");
     picker.type="color";
     picker.value=p.color;
-    picker.style.cssText="width:100%;height:45px;border:0;background:white";
+    picker.style.cssText=
+      "width:100%;height:45px;border:0;background:white";
+
     picker.oninput=()=>{
       p.color=picker.value;
       renderStudio();
     };
+
     panel.append(lab,picker);
     return;
   }
@@ -1024,23 +940,24 @@ function renderStudioPanel(){
     function rangeControl(title,key,min,max,step){
       const lab=document.createElement("label");
       lab.textContent=title+": "+p[key];
+
       const input=document.createElement("input");
       input.type="range";
-      input.min=min;input.max=max;input.step=step;
+      input.min=min;
+      input.max=max;
+      input.step=step;
       input.value=p[key];
+
       input.oninput=()=>{
         p[key]=Number(input.value);
-        if(key==="size"){
-          const pos=safePosition(p.x,p.y,p.size);
-          p.x=pos.x;p.y=pos.y;
-        }
         lab.textContent=title+": "+p[key];
         renderStudio();
       };
+
       panel.append(lab,input);
     }
 
-    rangeControl("Boyut","size",8,44,1);
+    rangeControl("Boyut","size",8,40,1);
     rangeControl("Döndürme","rotation",0,360,1);
     rangeControl("Opaklık","opacity",0.2,1,0.05);
 
@@ -1056,9 +973,9 @@ function renderStudioPanel(){
   }
 
   if(studioTab==="frame"){
-    const title=document.createElement("h3");
-    title.textContent="Çerçeve biçimi";
-    panel.append(title);
+    const h=document.createElement("h3");
+    h.textContent="Çerçeve biçimi";
+    panel.append(h);
 
     const row=document.createElement("div");
     row.className="row";
@@ -1079,30 +996,37 @@ function renderStudioPanel(){
       if(design.frame===value)b.classList.add("active");
       row.append(b);
     }
+
     panel.append(row);
 
     const lab=document.createElement("label");
     lab.textContent="Çerçeve rengi";
+
     const picker=document.createElement("input");
     picker.type="color";
     picker.value=design.frameColor;
-    picker.style.cssText="width:100%;height:45px;border:0;background:white";
+    picker.style.cssText=
+      "width:100%;height:45px;border:0;background:white";
     picker.oninput=()=>{
       design.frameColor=picker.value;
       renderStudio();
     };
 
     const thickLabel=document.createElement("label");
-    thickLabel.textContent="Çizgi kalınlığı (mm): "+design.frameWidth;
+    thickLabel.textContent=
+      "Çizgi kalınlığı (mm): "+design.frameWidth;
+
     const range=document.createElement("input");
     range.type="range";
-    range.min="0.1";
-    range.max="30";
-    range.step="0.1";
+    range.min="0.05";
+    range.max="0.5";
+    range.step="0.05";
     range.value=design.frameWidth;
+
     range.oninput=()=>{
       design.frameWidth=Number(range.value);
-      thickLabel.textContent="Çizgi kalınlığı (mm): "+design.frameWidth;
+      thickLabel.textContent=
+        "Çizgi kalınlığı (mm): "+design.frameWidth;
       renderStudio();
     };
 
@@ -1112,6 +1036,7 @@ function renderStudioPanel(){
 
 async function saveDesign(){
   if(!currentAlbumId)return;
+
   const a=await getAlbum(currentAlbumId);
   a.design=JSON.parse(JSON.stringify(design));
   await saveAlbum(a);
@@ -1119,7 +1044,7 @@ async function saveDesign(){
   alert("QR tasarımın kaydedildi ♡");
 }
 
-/* ÇIKARTMA OLUŞTURMA */
+/* PNG VE PDF İÇİN ÇIKARTMA ÇİZİMİ */
 
 function loadImage(src){
   return new Promise((resolve,reject)=>{
@@ -1130,34 +1055,38 @@ function loadImage(src){
   });
 }
 
-async function stickerCanvas(album,size=800,override=null){
+async function stickerCanvas(album,size=1000,override=null){
   const d=normalizeDesign(override||album.design);
   const canvas=document.createElement("canvas");
   canvas.width=size;
   canvas.height=size;
+
   const ctx=canvas.getContext("2d");
-  const scale=size/300;
+  ctx.scale(size/300,size/300);
 
-  ctx.scale(scale,scale);
+  /*
+    Toplam çıkartma: 300 birim = 20 mm
+    QR arka planı: 246 birim = 16.4 mm
+    QR görseli: 240 birim = 16 mm
+  */
 
-  /* QR alanının altı beyaz, çevresi şeffaf */
   ctx.fillStyle="#ffffff";
-  ctx.fillRect(42,42,216,216);
+  ctx.fillRect(27,27,246,246);
 
   const img=await loadImage(await qrData(album.id));
-  ctx.drawImage(img,47,47,206,206);
+  ctx.drawImage(img,30,30,240,240);
 
-  /* Çerçeve */
   if(d.frame!=="none"){
     ctx.save();
     ctx.strokeStyle=d.frameColor;
     ctx.lineWidth=d.frameWidth*15;
+
     if(d.frame==="dashed")ctx.setLineDash([8,5]);
     if(d.frame==="dotted")ctx.setLineDash([1,5]);
 
     ctx.beginPath();
-    if(d.frame==="rounded"){
-      ctx.roundRect(2,2,296,296,25);
+    if(d.frame==="rounded"&&ctx.roundRect){
+      ctx.roundRect(2,2,296,296,24);
     }else{
       ctx.rect(2,2,296,296);
     }
@@ -1165,7 +1094,6 @@ async function stickerCanvas(album,size=800,override=null){
     ctx.restore();
   }
 
-  /* Süslemeler */
   for(const p of d.pieces){
     ctx.save();
     ctx.translate(p.x*3,p.y*3);
@@ -1174,7 +1102,7 @@ async function stickerCanvas(album,size=800,override=null){
     ctx.fillStyle=p.color||"#d79bab";
     ctx.textAlign="center";
     ctx.textBaseline="middle";
-    ctx.font=`${p.size||20}px Georgia,serif`;
+    ctx.font=`${p.size||18}px Georgia,serif`;
     ctx.fillText(p.symbol||"✿",0,0);
     ctx.restore();
   }
@@ -1184,35 +1112,42 @@ async function stickerCanvas(album,size=800,override=null){
 
 async function openQR(){
   if(!currentAlbumId)return;
-  const a=await getAlbum(currentAlbumId);
-  const box=$("qrPreview");
-  box.replaceChildren();
 
-  const canvas=await stickerCanvas(a,800,design);
-  const img=document.createElement("img");
-  img.src=canvas.toDataURL("image/png");
-  img.alt="QR çıkartma önizlemesi";
-  box.append(img);
+  try{
+    const a=await getAlbum(currentAlbumId);
+    const canvas=await stickerCanvas(a,1000,design);
 
-  show("qrScreen");
+    const box=$("qrPreview");
+    box.replaceChildren();
+
+    const img=document.createElement("img");
+    img.src=canvas.toDataURL("image/png");
+    img.alt="QR çıkartma önizlemesi";
+    box.append(img);
+
+    show("qrScreen");
+  }catch(e){
+    alert("QR önizlemesi oluşturulamadı: "+e.message);
+  }
 }
 
 function downloadBlob(blob,name){
-  const u=URL.createObjectURL(blob);
+  const url=URL.createObjectURL(blob);
   const a=document.createElement("a");
-  a.href=u;
+  a.href=url;
   a.download=name;
   document.body.append(a);
   a.click();
   a.remove();
-  setTimeout(()=>URL.revokeObjectURL(u),1000);
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
 }
 
 async function downloadQR(){
   try{
     const a=await getAlbum(currentAlbumId);
-    const c=await stickerCanvas(a,1000,design);
-    c.toBlob(blob=>{
+    const canvas=await stickerCanvas(a,1000,design);
+
+    canvas.toBlob(blob=>{
       if(blob)downloadBlob(blob,"ani-kutusu-qr.png");
     },"image/png");
   }catch(e){
@@ -1220,14 +1155,13 @@ async function downloadQR(){
   }
 }
 
-/* A4 PDF BASKI MERKEZİ */
+/* QR SEÇİM EKRANI */
 
 async function openSelection(){
   selectionAlbums=await allAlbums();
   selectionAlbums.sort((a,b)=>
     (b.date||"").localeCompare(a.date||"")
   );
-
   selectionIds=new Set();
   renderSelection();
   show("selectionScreen");
@@ -1284,6 +1218,23 @@ function toggleAllSelections(){
   renderSelection();
 }
 
+/* A4 PDF: 20 × 20 mm QR */
+
+async function exportCurrentPDF(){
+  if(!currentAlbumId)return;
+  const a=await getAlbum(currentAlbumId);
+
+  const copy={...a};
+  if(design&&(
+    $("studioScreen").classList.contains("show")||
+    $("qrScreen").classList.contains("show")
+  )){
+    copy.design=design;
+  }
+
+  await createA4PDF([copy],"tek-album-qr.pdf");
+}
+
 async function exportSelectedPDF(){
   const albums=selectionAlbums.filter(a=>selectionIds.has(a.id));
   await createA4PDF(albums,"secili-qr-cikartmalari.pdf");
@@ -1294,20 +1245,6 @@ async function exportAllPDF(){
   await createA4PDF(albums,"tum-qr-cikartmalari.pdf");
 }
 
-async function exportCurrentPDF(){
-  if(!currentAlbumId)return;
-  const a=await getAlbum(currentAlbumId);
-
-  /* Atölyede henüz kaydedilmemiş düzenlemeleri de kullan */
-  const copy={...a};
-  if(design && $("studioScreen").classList.contains("show"))
-    copy.design=design;
-  if(design && $("qrScreen").classList.contains("show"))
-    copy.design=design;
-
-  await createA4PDF([copy],"tek-album-qr.pdf");
-}
-
 async function createA4PDF(albums,filename){
   if(!albums.length){
     alert("PDF için en az bir albüm seç.");
@@ -1315,20 +1252,11 @@ async function createA4PDF(albums,filename){
   }
 
   if(!window.jspdf){
-    alert("PDF kütüphanesi yüklenemedi. İnternet bağlantını kontrol et.");
+    alert("PDF kütüphanesi yüklenemedi.");
     return;
   }
 
   const {jsPDF}=window.jspdf;
-
-  /*
-    A4: 210 × 297 mm
-    QR: 20 × 20 mm
-    Yatay boşluk: 5 mm
-    Dikey boşluk: 5 mm
-    7 sütun × 10 satır = 70 çıkartma
-  */
-
   const pdf=new jsPDF({
     orientation:"portrait",
     unit:"mm",
@@ -1338,46 +1266,38 @@ async function createA4PDF(albums,filename){
 
   const sticker=20;
   const gap=5;
-  const columns=7;
+  const cols=7;
   const rows=10;
-  const perPage=columns*rows;
+  const perPage=cols*rows;
 
-  const usedWidth=columns*sticker+(columns-1)*gap;
+  const usedWidth=cols*sticker+(cols-1)*gap;
   const usedHeight=rows*sticker+(rows-1)*gap;
-
   const startX=(210-usedWidth)/2;
   const startY=(297-usedHeight)/2;
 
   try{
     for(let i=0;i<albums.length;i++){
-      if(i>0 && i%perPage===0)pdf.addPage();
+      if(i>0&&i%perPage===0)pdf.addPage();
 
-      const pageIndex=i%perPage;
-      const col=pageIndex%columns;
-      const row=Math.floor(pageIndex/columns);
+      const pos=i%perPage;
+      const col=pos%cols;
+      const row=Math.floor(pos/cols);
 
       const x=startX+col*(sticker+gap);
       const y=startY+row*(sticker+gap);
 
-      const canvas=await stickerCanvas(albums[i],800);
+      const canvas=await stickerCanvas(albums[i],1000);
       const data=canvas.toDataURL("image/png");
 
       pdf.addImage(
-        data,
-        "PNG",
-        x,
-        y,
-        sticker,
-        sticker,
-        undefined,
-        "FAST"
+        data,"PNG",x,y,sticker,sticker,undefined,"FAST"
       );
     }
 
     pdf.save(filename);
   }catch(e){
     console.error(e);
-    alert("PDF hazırlanamadı: "+e.message);
+    alert("PDF oluşturulamadı: "+e.message);
   }
 }
 
@@ -1392,10 +1312,10 @@ function bytesToBase64(bytes){
 }
 
 function base64ToBytes(str){
-  const binary=atob(str);
-  const bytes=new Uint8Array(binary.length);
-  for(let i=0;i<binary.length;i++)
-    bytes[i]=binary.charCodeAt(i);
+  const bin=atob(str);
+  const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)
+    bytes[i]=bin.charCodeAt(i);
   return bytes;
 }
 
@@ -1439,8 +1359,9 @@ async function deriveKey(password,salt){
 }
 
 async function backup(){
-  const password=prompt("Yedek dosyasını koruyacak bir şifre belirle:");
+  const password=prompt("Yedek için bir şifre belirle:");
   if(!password)return;
+
   if(password.length<6){
     alert("En az 6 karakterlik bir yedek şifresi seç.");
     return;
@@ -1452,6 +1373,7 @@ async function backup(){
 
     for(const a of albums){
       const copy={...a,media:[]};
+
       for(const m of a.media||[]){
         copy.media.push({
           id:m.id,
@@ -1460,6 +1382,7 @@ async function backup(){
           data:await blobToDataURL(m.blob)
         });
       }
+
       portable.push(copy);
     }
 
@@ -1492,7 +1415,7 @@ async function backup(){
       "ani-kutusu-sifreli-yedek.json"
     );
 
-    alert("Şifreli yedeğin indirildi. Şifreni unutma.");
+    alert("Şifreli yedeğin indirildi.");
   }catch(e){
     alert("Yedek oluşturulamadı: "+e.message);
   }
@@ -1500,8 +1423,7 @@ async function backup(){
 
 async function restoreBackup(file){
   if(!file)return;
-
-  const password=prompt("Yedek dosyasının şifresini gir:");
+  const password=prompt("Yedek dosyasının şifresi:");
   if(!password)return;
 
   try{
@@ -1548,12 +1470,11 @@ async function restoreBackup(file){
     alert("Yedek geri yüklendi ♡");
     show("home");
   }catch(e){
-    console.error(e);
-    alert("Yedek açılamadı. Şifreyi veya dosyayı kontrol et.");
+    alert("Yedek açılamadı: "+e.message);
   }
 }
 
-/* UYGULAMA KİLİDİ */
+/* GİRİŞ ŞİFRESİ */
 
 async function hashPassword(password,salt){
   const data=new TextEncoder().encode(password+salt);
@@ -1572,13 +1493,13 @@ async function setupLock(){
   input.value="";
 
   if(!existing){
-    msg.textContent="Uygulaman için bir giriş şifresi oluştur.";
+    msg.textContent="Anı kutun için yeni bir şifre oluştur.";
     button.textContent="Şifre oluştur";
 
     button.onclick=async()=>{
       const password=input.value;
       if(password.length<4){
-        alert("En az 4 karakterlik şifre gir.");
+        alert("Şifren en az 4 karakter olsun.");
         return;
       }
 
@@ -1611,14 +1532,9 @@ async function setupLock(){
 
 async function routeQR(){
   const id=new URLSearchParams(location.search).get("id");
-  if(id){
-    await openAlbum(id);
-  }else{
-    show("home");
-  }
+  if(id)await openAlbum(id);
+  else show("home");
 }
-
-/* BAŞLAT */
 
 async function init(){
   try{
