@@ -342,32 +342,67 @@ async function createAlbum(){
   await saveAlbum(a);
   await openAlbum(a.id);
 }
-async function renderAlbums(){
-  const albums=await allAlbums();
-  const box=$("albumList");
+
+async function renderAlbums() {
+  const albums = await allAlbums();
+  const box = $("albumList");
+
   box.replaceChildren();
-  if(!albums.length){
-    const p=document.createElement("p");
-    p.className="muted";
-    p.textContent="Henüz albümün yok ♡";
+  revokeUrls();
+
+  if (!albums.length) {
+    const p = document.createElement("p");
+    p.className = "muted";
+    p.textContent = "Henüz albümün yok ♡";
     box.append(p);
     return;
   }
-  albums.sort((a,b)=>(b.date||"").localeCompare(a.date||""));
-  for(const a of albums){
-    const b=document.createElement("button");
-    b.className="album-tile";
-    const icon=document.createElement("div");
-    icon.className="album-icon";icon.textContent="♡";
-    const title=document.createElement("strong");
-    title.textContent=a.title;
-    const date=document.createElement("small");
-    date.textContent=a.date||"";
-    b.append(icon,title,date);
-    b.onclick=()=>openAlbum(a.id);
+
+  albums.sort((a, b) =>
+    (b.date || "").localeCompare(a.date || "")
+  );
+
+  for (const a of albums) {
+    const b = document.createElement("button");
+    b.className = "album-tile";
+
+    const cover = document.createElement("div");
+    cover.className = "album-icon";
+
+    const firstPhoto = (a.media || []).find(
+      m => m.type?.startsWith("image/") &&
+           m.blob instanceof Blob
+    );
+
+    if (firstPhoto) {
+      const img = document.createElement("img");
+      img.src = fileUrl(firstPhoto.blob);
+      img.alt = "Albüm kapağı";
+      img.style.cssText = `
+        width:100%;
+        height:125px;
+        object-fit:cover;
+        border-radius:10px;
+        display:block;
+      `;
+      cover.append(img);
+    } else {
+      cover.textContent = "♡";
+    }
+
+    const title = document.createElement("strong");
+    title.textContent = a.title;
+
+    const date = document.createElement("small");
+    date.textContent = a.date || "";
+
+    b.append(cover, title, date);
+    b.onclick = () => openAlbum(a.id);
+
     box.append(b);
   }
 }
+
 
 function revokeUrls(){
   objectUrls.forEach(URL.revokeObjectURL);
@@ -501,6 +536,33 @@ alert("Seçilen dosya sayısı: " + files.length);
         (error.message || error.name)
       );
     }
+  }
+}
+
+async function removeMedia(mediaId) {
+  if (!currentAlbumId) return;
+
+  if (!confirm("Bu fotoğraf veya dosya silinsin mi?")) return;
+
+  try {
+    const album = await getAlbum(currentAlbumId);
+
+    if (!album) {
+      alert("Albüm bulunamadı.");
+      return;
+    }
+
+    album.media = (album.media || []).filter(
+      media => media.id !== mediaId
+    );
+
+    await saveAlbum(album);
+    currentAlbum = album;
+    renderMedia();
+
+  } catch (error) {
+    console.error(error);
+    alert("Dosya silinemedi: " + error.message);
   }
 }
 
