@@ -95,7 +95,19 @@ input[type=range]{width:100%;accent-color:var(--pink)}
 @media(max-width:480px){
   .studio-board{width:270px;height:270px}
   .symbol-grid{grid-template-columns:repeat(5,1fr)}
+  
 }
+  .media-card .remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 5;
+  min-width: 44px;
+  min-height: 44px;
+  background: white;
+  border-radius: 10px;
+  touch-action: manipulation;
+  }
 </style>
 </head>
 <body>
@@ -443,10 +455,16 @@ function renderMedia(){
       el=document.createElement("audio");
       el.src=fileUrl(m.blob);el.controls=true;
     }
-    const del=document.createElement("button");
-    del.className="btn danger remove";del.textContent="🗑";
-    del.onclick=()=>removeMedia(m.id);
-    card.append(el,del);box.append(card);
+    const del = document.createElement("button");
+
+    del.type = "button";
+    del.className = "btn danger remove";
+    del.textContent = "🗑";
+
+    del.onclick = () => removeMedia(m.id);
+
+    card.append(el, del);
+    box.append(card);
   }
 }
 
