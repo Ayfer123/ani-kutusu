@@ -162,7 +162,7 @@ input[type=range]{width:100%;accent-color:var(--pink)}
       <button class="btn danger" onclick="deleteAlbum()">Albümü sil</button>
     </div>
     <input id="mediaInput" type="file" hidden multiple accept="image/*,video/*,audio/*"
-           onchange="upload(this.files);this.value=''">
+           onchange="const files=Array.from(this.files);this.value='';upload(files)">
   </div>
   <div id="mediaList" class="media-grid"></div>
 </section>
