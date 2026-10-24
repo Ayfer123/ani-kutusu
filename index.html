@@ -162,7 +162,7 @@ input[type=range]{width:100%;accent-color:var(--pink)}
       <button class="btn danger" onclick="deleteAlbum()">Albümü sil</button>
     </div>
     <input id="mediaInput" type="file" hidden multiple accept="image/*,video/*,audio/*"
-           onchange="const files=Array.from(this.files);this.value='';upload(files)">
+           onchange="upload(Array.from(this.files))">
   </div>
   <div id="mediaList" class="media-grid"></div>
 </section>
@@ -416,6 +416,8 @@ function renderMedia(){
 }
 
 async function upload(files) {
+  console.log("Seçilen dosya sayısı:", files.length);
+alert("Seçilen dosya sayısı: " + files.length);
   if (!files || files.length === 0) return;
 
   try {
