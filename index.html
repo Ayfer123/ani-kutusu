@@ -108,6 +108,243 @@ input[type=range]{width:100%;accent-color:var(--pink)}
   border-radius: 10px;
   touch-action: manipulation;
   }
+  
+/* MOONCAM - EĞİK POLAROID ALBÜM KAPAKLARI */
+
+#albumList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 18px;
+  padding: 30px 10px;
+  align-items: start;
+}
+
+#albumList .album-tile {
+  position: relative;
+  width: 100%;
+  padding: 9px 9px 23px;
+  border: 0;
+  border-radius: 2px;
+  background: #fffaf3;
+  color: #554655;
+  text-align: center;
+  box-shadow: 3px 8px 15px #32283b50;
+  transform: rotate(-5deg);
+  transition: transform .25s, box-shadow .25s;
+}
+
+/* Her albüm farklı yöne eğilsin */
+
+#albumList .album-tile:nth-child(4n+2) {
+  transform: rotate(6deg) translateY(15px);
+}
+
+#albumList .album-tile:nth-child(4n+3) {
+  transform: rotate(3deg);
+}
+
+#albumList .album-tile:nth-child(4n+4) {
+  transform: rotate(-7deg) translateY(12px);
+}
+
+/* Albümün kapak fotoğrafı */
+
+#albumList .album-icon {
+  width: 100%;
+  margin: 0 0 12px;
+  background: #e4d8e7;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#albumList .album-icon img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  border-radius: 0 !important;
+}
+
+/* Polaroidin altındaki yazılar */
+
+#albumList .album-tile strong {
+  font-family: Georgia, serif;
+  font-size: 15px;
+  font-style: italic;
+}
+
+#albumList .album-tile small {
+  font-size: 11px;
+  margin-top: 5px;
+}
+
+/* Üstteki yarı saydam bant */
+
+#albumList .album-tile::before {
+  content: "";
+  position: absolute;
+  width: 48px;
+  height: 18px;
+  top: -10px;
+  left: 50%;
+  background: #d8b9d4b8;
+  transform: translateX(-50%) rotate(-8deg);
+  z-index: 2;
+  box-shadow: 0 2px 4px #0002;
+}
+
+/* Dokununca hafif doğrulsun */
+
+#albumList .album-tile:active {
+  transform: rotate(0deg) scale(1.03);
+}
+
+/* MOONCAM - SÜSLÜ ANI PANOSU */
+
+.memory-board {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #28263e;
+  border: 1px solid #514863;
+  border-radius: 22px;
+  padding: 24px 12px 35px;
+  margin: 15px 0 25px;
+  box-shadow: 0 12px 30px #26203930;
+}
+
+/* Panonun üstündeki başlık */
+
+.board-heading {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  font-family: Georgia, serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: #e9d9ee;
+  margin: 5px 0 20px;
+}
+
+/* Dekorasyon katmanı */
+
+.board-decor {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.memory-board #albumList {
+  position: relative;
+  z-index: 1;
+}
+
+/* İnce dekoratif ipler */
+
+.board-decor .thread {
+  position: absolute;
+  display: block;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #d5afc6,
+    #a6a2c9,
+    transparent
+  );
+  opacity: .65;
+  box-shadow: 0 2px 3px #0006;
+}
+
+.thread-1 {
+  width: 115%;
+  top: 24%;
+  left: -12%;
+  transform: rotate(22deg);
+}
+
+.thread-2 {
+  width: 120%;
+  top: 58%;
+  left: -10%;
+  transform: rotate(-18deg);
+}
+
+.thread-3 {
+  width: 105%;
+  top: 85%;
+  left: -5%;
+  transform: rotate(14deg);
+}
+
+/* Kurutulmuş çiçek görünümü */
+
+.board-decor .flower {
+  position: absolute;
+  color: #d9b9c8;
+  font-family: Georgia, serif;
+  text-shadow: 1px 3px 5px #0008;
+  opacity: .85;
+}
+
+.flower-1 {
+  top: 11%;
+  right: 5%;
+  font-size: 29px;
+  transform: rotate(-20deg);
+}
+
+.flower-2 {
+  top: 49%;
+  left: 3%;
+  font-size: 23px;
+  transform: rotate(28deg);
+}
+
+.flower-3 {
+  bottom: 5%;
+  right: 7%;
+  font-size: 26px;
+}
+
+/* Küçük yıldızlar */
+
+.board-decor .star {
+  position: absolute;
+  color: #ead6e5;
+  opacity: .75;
+  text-shadow: 0 2px 5px #0008;
+}
+
+.star-1 {
+  top: 7%;
+  left: 10%;
+  font-size: 16px;
+}
+
+.star-2 {
+  top: 42%;
+  right: 3%;
+  font-size: 22px;
+}
+
+.star-3 {
+  bottom: 16%;
+  left: 43%;
+  font-size: 18px;
+}
+
+/* Polaroidleri dekorasyonların önünde tut */
+
+.memory-board .album-tile {
+  position: relative;
+  z-index: 2;
+}
+
 </style>
 </head>
 <body>
