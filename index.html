@@ -271,7 +271,7 @@ const DECORATIONS={
   "Çiçekler":["✿","❀","❁","✾","✽","✼"],
   "Yıldızlar":["✦","✧","✶","✳","⋆","✺"],
   "Kalpler":["♡","♥","❥","ღ","❦","❧"],
-  "Doğa":["☘","♧","❃","☼","☾","❋"],
+  "Doğa":["☘","♧","❃","🐾","💚","❋"],
   "Detaylar":["⌁","✣","✤","✥","❈","✢"]
 };
 
@@ -414,22 +414,94 @@ function renderMedia(){
     card.append(el,del);box.append(card);
   }
 }
-async function upload(files){
-  if(!currentAlbum)return;
-  const a=await getAlbum(currentAlbumId);
-  if(!Array.isArray(a.media))a.media=[];
-  for(const f of files){
-    if(!/^(image|video|audio)\//.test(f.type))continue;
-    a.media.push({id:uid(),type:f.type,name:f.name,blob:f});
+
+async function upload(files) {
+  if (!files || files.length === 0) return;
+
+  try {
+    if (!currentAlbumId) {
+      throw new Error("Açık albüm bulunamadı.");
+    }
+
+    const a = await getAlbum(currentAlbumId);
+
+    if (!a) {
+      throw new Error("Albüm bulunamadı.");
+    }
+
+    if (!Array.isArray(a.media)) {
+      a.media = [];
+    }
+
+    let added = 0;
+
+    for (const f of Array.from(files)) {
+      let type = f.type || "";
+
+      // Bazı Android dosyalarında tür boş gelebilir.
+      if (!type) {
+        const ext = f.name.split(".").pop().toLowerCase();
+
+        const types = {
+          jpg: "image/jpeg",
+          jpeg: "image/jpeg",
+          png: "image/png",
+          webp: "image/webp",
+          heic: "image/heic",
+          heif: "image/heif",
+          gif: "image/gif",
+          mp4: "video/mp4",
+          mp3: "audio/mpeg",
+          m4a: "audio/mp4"
+        };
+
+        type = types[ext] || "";
+      }
+
+      if (!/^(image|video|audio)\//.test(type)) {
+        throw new Error(
+          "Desteklenmeyen dosya: " + f.name
+        );
+      }
+
+      a.media.push({
+        id: uid(),
+        type: type,
+        name: f.name,
+        blob: f
+      });
+
+      added++;
+    }
+
+    await saveAlbum(a);
+
+    // Kaydedilen albümü yeniden oku.
+    const saved = await getAlbum(currentAlbumId);
+
+    if (!saved) {
+      throw new Error("Kaydedilen albüm okunamadı.");
+    }
+
+    currentAlbum = saved;
+    renderMedia();
+
+    alert(added + " dosya başarıyla eklendi ♡");
+
+  } catch (error) {
+    console.error("Fotoğraf ekleme hatası:", error);
+
+    if (error.name === "QuotaExceededError") {
+      alert("Depolama alanı dolmuş olabilir.");
+    } else {
+      alert(
+        "Fotoğraf eklenemedi:\n" +
+        (error.message || error.name)
+      );
+    }
   }
-  await saveAlbum(a);currentAlbum=a;renderMedia();
 }
-async function removeMedia(id){
-  if(!confirm("Bu dosyayı silmek istiyor musun?"))return;
-  const a=await getAlbum(currentAlbumId);
-  a.media=(a.media||[]).filter(m=>m.id!==id);
-  await saveAlbum(a);currentAlbum=a;renderMedia();
-}
+
 async function deleteAlbum(){
   if(!confirm("Albüm ve içindeki dosyalar silinsin mi?"))return;
   await eraseAlbum(currentAlbumId);
