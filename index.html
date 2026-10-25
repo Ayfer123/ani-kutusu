@@ -459,6 +459,10 @@ header {
   <div class="card" style="margin-top:15px">
     <h1 id="openAlbumTitle"></h1>
     <small id="openAlbumDate"></small>
+    <button class="btn" style="margin-top:12px"
+        onclick="editAlbumInfo()">
+  ✎ Adı ve tarihi düzenle
+    </button>
     <div class="row" style="margin-top:17px">
       <button class="btn primary" onclick="$('mediaInput').click()">+ Fotoğraf / video / ses</button>
       <button class="btn" onclick="openStudio()">✿ QR tasarla</button>
@@ -729,6 +733,59 @@ async function openAlbum(id){
   renderMedia();
   show("albumScreen");
 }
+  
+async function editAlbumInfo() {
+  if (!currentAlbumId) return;
+
+  const album = await getAlbum(currentAlbumId);
+
+  if (!album) {
+    alert("Albüm bulunamadı.");
+    return;
+  }
+
+  // Albüm adını değiştir
+  const newTitle = prompt(
+    "Albümün yeni adı:",
+    album.title
+  );
+
+  if (newTitle === null) return;
+
+  if (!newTitle.trim()) {
+    alert("Albüm adı boş olamaz.");
+    return;
+  }
+
+  // Albüm tarihini değiştir
+  const newDate = prompt(
+    "Yeni tarih (YYYY-AA-GG):",
+    album.date || ""
+  );
+
+  if (newDate === null) return;
+
+  // Tarihi kontrol et
+  if (newDate && !/^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
+    alert("Tarihi 2026-10-25 biçiminde yaz.");
+    return;
+  }
+
+  // Yalnızca ad ve tarihi değiştir
+  album.title = newTitle.trim();
+  album.date = newDate;
+
+  await saveAlbum(album);
+
+  currentAlbum = album;
+
+  // Ekrandaki bilgileri güncelle
+  $("openAlbumTitle").textContent = album.title;
+  $("openAlbumDate").textContent = album.date || "";
+
+  alert("Albüm bilgileri güncellendi ♡");
+}
+
 function renderMedia(){
   revokeUrls();
   const box=$("mediaList");
