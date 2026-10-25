@@ -455,14 +455,30 @@ header {
 </section>
 
 <section id="albumScreen" class="screen">
-  <button class="btn" onclick="show('home')">← Albümler</button>
-  <div class="card" style="margin-top:15px">
-    <h1 id="openAlbumTitle"></h1>
-    <small id="openAlbumDate"></small>
-    <button class="btn" style="margin-top:12px"
-        onclick="editAlbumInfo()">
+  <button type="button" class="btn" onclick="openAlbumEditor()">
   ✎ Adı ve tarihi düzenle
+</button>
+
+<div id="albumEditor" class="card"
+     style="display:none;margin-top:12px">
+
+  <label>Albüm adı</label>
+  <input id="editAlbumTitle" type="text">
+
+  <label>Albüm tarihi</label>
+  <input id="editAlbumDate" type="date">
+
+  <div class="row" style="margin-top:14px">
+    <button type="button" class="btn primary"
+            onclick="saveAlbumEditor()">
+      ✓ Kaydet
     </button>
+    <button type="button" class="btn"
+            onclick="closeAlbumEditor()">
+      İptal
+    </button>
+  </div>
+</div>
     <div class="row" style="margin-top:17px">
       <button class="btn primary" onclick="$('mediaInput').click()">+ Fotoğraf / video / ses</button>
       <button class="btn" onclick="openStudio()">✿ QR tasarla</button>
@@ -734,57 +750,53 @@ async function openAlbum(id){
   show("albumScreen");
 }
   
-async function editAlbumInfo() {
+
+function openAlbumEditor() {
   if (!currentAlbumId) return;
 
-  const album = await getAlbum(currentAlbumId);
+  $("editAlbumTitle").value = currentAlbum.title || "";
+  $("editAlbumDate").value = currentAlbum.date || "";
+  $("albumEditor").style.display = "block";
+}
 
-  if (!album) {
-    alert("Albüm bulunamadı.");
-    return;
-  }
+function closeAlbumEditor() {
+  $("albumEditor").style.display = "none";
+}
 
-  // Albüm adını değiştir
-  const newTitle = prompt(
-    "Albümün yeni adı:",
-    album.title
-  );
+async function saveAlbumEditor() {
+  const title = $("editAlbumTitle").value.trim();
+  const date = $("editAlbumDate").value;
 
-  if (newTitle === null) return;
-
-  if (!newTitle.trim()) {
+  if (!title) {
     alert("Albüm adı boş olamaz.");
     return;
   }
 
-  // Albüm tarihini değiştir
-  const newDate = prompt(
-    "Yeni tarih (YYYY-AA-GG):",
-    album.date || ""
-  );
+  try {
+    const album = await getAlbum(currentAlbumId);
 
-  if (newDate === null) return;
+    if (!album) {
+      alert("Albüm bulunamadı.");
+      return;
+    }
 
-  // Tarihi kontrol et
-  if (newDate && !/^\d{4}-\d{2}-\d{2}$/.test(newDate)) {
-    alert("Tarihi 2026-10-25 biçiminde yaz.");
-    return;
+    album.title = title;
+    album.date = date;
+
+    await saveAlbum(album);
+    currentAlbum = album;
+
+    $("openAlbumTitle").textContent = title;
+    $("openAlbumDate").textContent = date;
+
+    closeAlbumEditor();
+    alert("Albüm bilgileri kaydedildi ♡");
+
+  } catch (error) {
+    alert("Kaydetme hatası: " + error.message);
   }
-
-  // Yalnızca ad ve tarihi değiştir
-  album.title = newTitle.trim();
-  album.date = newDate;
-
-  await saveAlbum(album);
-
-  currentAlbum = album;
-
-  // Ekrandaki bilgileri güncelle
-  $("openAlbumTitle").textContent = album.title;
-  $("openAlbumDate").textContent = album.date || "";
-
-  alert("Albüm bilgileri güncellendi ♡");
 }
+
 
 function renderMedia(){
   revokeUrls();
