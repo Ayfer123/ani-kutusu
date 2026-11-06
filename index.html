@@ -455,41 +455,75 @@ header {
 </section>
 
 <section id="albumScreen" class="screen">
-  <button type="button" class="btn" onclick="openAlbumEditor()">
-  ✎ Adı ve tarihi düzenle
-</button>
 
-<div id="albumEditor" class="card"
-     style="display:none;margin-top:12px">
+  <button class="btn" onclick="show('home')">
+    ← Albümler
+  </button>
 
-  <label>Albüm adı</label>
-  <input id="editAlbumTitle" type="text">
+  <div class="card" style="margin-top:15px">
 
-  <label>Albüm tarihi</label>
-  <input id="editAlbumDate" type="date">
+    <h1 id="openAlbumTitle"></h1>
+    <small id="openAlbumDate"></small>
 
-  <div class="row" style="margin-top:14px">
-    <button type="button" class="btn primary"
-            onclick="saveAlbumEditor()">
-      ✓ Kaydet
-    </button>
     <button type="button" class="btn"
-            onclick="closeAlbumEditor()">
-      İptal
+            style="margin-top:12px"
+            onclick="openAlbumEditor()">
+      ✎ Adı ve tarihi düzenle
     </button>
-  </div>
-</div>
-    <div class="row" style="margin-top:17px">
-      <button class="btn primary" onclick="$('mediaInput').click()">+ Fotoğraf / video / ses</button>
-      <button class="btn" onclick="openStudio()">✿ QR tasarla</button>
-      <button class="btn" onclick="exportCurrentPDF()">↓ Bu QR'ı PDF indir</button>
-      <button class="btn danger" onclick="deleteAlbum()">Albümü sil</button>
+
+    <div id="albumEditor" class="card"
+         style="display:none;margin-top:12px">
+
+      <label>Albüm adı</label>
+      <input id="editAlbumTitle" type="text">
+
+      <label>Albüm tarihi</label>
+      <input id="editAlbumDate" type="date">
+
+      <div class="row" style="margin-top:14px">
+        <button type="button" class="btn primary"
+                onclick="saveAlbumEditor()">
+          ✓ Kaydet
+        </button>
+
+        <button type="button" class="btn"
+                onclick="closeAlbumEditor()">
+          İptal
+        </button>
+      </div>
     </div>
-    <input id="mediaInput" type="file" hidden multiple accept="image/*,video/*,audio/*"
+
+    <div class="row" style="margin-top:17px">
+
+      <button class="btn primary"
+              onclick="$('mediaInput').click()">
+        + Fotoğraf / video / ses
+      </button>
+
+      <button class="btn" onclick="openStudio()">
+        ✿ QR tasarla
+      </button>
+
+      <button class="btn" onclick="exportCurrentPDF()">
+        ↓ Bu QR'ı PDF indir
+      </button>
+
+      <button class="btn danger" onclick="deleteAlbum()">
+        Albümü sil
+      </button>
+
+    </div>
+
+    <input id="mediaInput" type="file" hidden multiple
+           accept="image/*,video/*,audio/*"
            onchange="upload(Array.from(this.files))">
+
   </div>
+
   <div id="mediaList" class="media-grid"></div>
+
 </section>
+
 
 <section id="studioScreen" class="screen">
   <div class="row between">
