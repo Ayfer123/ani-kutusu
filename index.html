@@ -702,6 +702,7 @@ async function createAlbum(){
 }
 
 async function renderAlbums() {
+async function renderAlbums() {
   const albums = await allAlbums();
   const box = $("albumList");
 
@@ -716,33 +717,45 @@ async function renderAlbums() {
     return;
   }
 
-  albums.sort((a, b) =>
-    (b.date || "").localeCompare(a.date || "")
-  );
+  // Kayıtlı albüm sırasını oku
+  const saved = await getSetting("albumOrder");
+  const order = saved?.value || [];
+
+  albums.sort((a, b) => {
+    const ai = order.indexOf(a.id);
+    const bi = order.indexOf(b.id);
+
+    if (ai !== -1 && bi !== -1) return ai - bi;
+    if (ai !== -1) return -1;
+    if (bi !== -1) return 1;
+
+    return (b.date || "").localeCompare(a.date || "");
+  });
+
+  let holdTimer = null;
+  let dragging = null;
+  let suppressClick = false;
 
   for (const a of albums) {
     const b = document.createElement("button");
     b.className = "album-tile";
+    b.dataset.albumId = a.id;
+    b.style.touchAction = "none";
 
     const cover = document.createElement("div");
     cover.className = "album-icon";
 
     const firstPhoto = (a.media || []).find(
       m => m.type?.startsWith("image/") &&
-           m.blob instanceof Blob
+      m.blob instanceof Blob
     );
 
     if (firstPhoto) {
       const img = document.createElement("img");
       img.src = fileUrl(firstPhoto.blob);
       img.alt = "Albüm kapağı";
-      img.style.cssText = `
-        width:100%;
-        height:125px;
-        object-fit:cover;
-        border-radius:10px;
-        display:block;
-      `;
+      img.style.cssText =
+        "width:100%;height:125px;object-fit:cover;border-radius:10px;display:block";
       cover.append(img);
     } else {
       cover.textContent = "♡";
@@ -755,13 +768,73 @@ async function renderAlbums() {
     date.textContent = a.date || "";
 
     b.append(cover, title, date);
-    b.onclick = () => openAlbum(a.id);
+
+    b.addEventListener("pointerdown", () => {
+      suppressClick = false;
+
+      holdTimer = setTimeout(() => {
+        dragging = b;
+        b.style.opacity = "0.65";
+        b.style.transform = "scale(1.04)";
+      }, 450);
+    });
+
+    b.addEventListener("pointermove", e => {
+      if (!dragging) return;
+
+      const target = document.elementFromPoint(
+        e.clientX, e.clientY
+      )?.closest(".album-tile");
+
+      if (!target || target === dragging) return;
+
+      const rect = target.getBoundingClientRect();
+
+      const after =
+        e.clientY > rect.top + rect.height / 2;
+
+      box.insertBefore(
+        dragging,
+        after ? target.nextSibling : target
+      );
+    });
+
+    const finishDrag = async () => {
+      clearTimeout(holdTimer);
+
+      if (!dragging) return;
+
+      dragging.style.opacity = "";
+      dragging.style.transform = "";
+
+      dragging = null;
+      suppressClick = true;
+
+      const newOrder = Array.from(box.children)
+        .map(el => el.dataset.albumId)
+        .filter(Boolean);
+
+      await setSetting({
+        key: "albumOrder",
+        value: newOrder
+      });
+
+      setTimeout(() => {
+        suppressClick = false;
+      }, 300);
+    };
+
+    b.addEventListener("pointerup", finishDrag);
+    b.addEventListener("pointercancel", finishDrag);
+
+    b.onclick = () => {
+      if (suppressClick) return;
+      openAlbum(a.id);
+    };
 
     box.append(b);
   }
-}
-
-
+  }
 function revokeUrls(){
   objectUrls.forEach(URL.revokeObjectURL);
   objectUrls=[];
