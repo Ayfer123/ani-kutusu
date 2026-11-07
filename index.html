@@ -740,17 +740,28 @@ function fileUrl(blob){
   objectUrls.push(u);
   return u;
 }
-async function openAlbum(id){
-  const a=await getAlbum(id);
-  if(!a){
-    alert("Bu albüm bu cihazda bulunamadı.");
-    return;
+async function openAlbum(id) {
+  try {
+    const a = await getAlbum(id);
+
+    if (!a) {
+      alert("Bu albüm bu cihazda bulunamadı.");
+      return;
+    }
+
+    currentAlbumId = id;
+    currentAlbum = a;
+
+    $("openAlbumTitle").textContent = a.title || "Albümüm ♡";
+    $("openAlbumDate").textContent = a.date || "";
+
+    renderMedia();
+    show("albumScreen");
+
+  } catch (error) {
+    console.error("Albüm açma hatası:", error);
+    alert("Albüm açılamadı: " + error.message);
   }
-  currentAlbumId=id;currentAlbum=a;
-  $("openAlbumTitle").textContent=a.title;
-  $("openAlbumDate").textContent=a.date||"";
-  renderMedia();
-  show("albumScreen");
 }
   
 
