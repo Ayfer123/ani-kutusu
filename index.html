@@ -688,9 +688,7 @@ async function createAlbum(){
   design: defaultDesign()
 };
     
-  await saveAlbum(a);
-  await openAlbum(a.id);
-}
+  
 
 async function renderAlbums() {
   const albums = await allAlbums();
