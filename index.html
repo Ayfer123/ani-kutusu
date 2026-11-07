@@ -676,10 +676,18 @@ function newAlbum(){
 async function createAlbum(){
   const title=$("albumTitle").value.trim();
   if(!title)return alert("Önce albüm adı yaz.");
-  const a={
-    id:uid(),title,date:$("albumDate").value,
-    theme:"pink",media:[],design:defaultDesign()
-  };
+  const existingAlbums = await allAlbums();
+  const nextOrder = existingAlbums.length;
+  const a = {
+  id: uid(),
+  title,
+  date: $("albumDate").value,
+  order: nextOrder,
+  theme: "pink",
+  media: [],
+  design: defaultDesign()
+};
+    
   await saveAlbum(a);
   await openAlbum(a.id);
 }
