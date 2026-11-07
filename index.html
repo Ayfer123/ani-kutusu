@@ -699,13 +699,19 @@ async function renderAlbums() {
     return;
   }
 
-  albums.sort((a, b) =>
-    (b.date || "").localeCompare(a.date || "")
-  );
+  albums.sort((a, b) => {
+    if (Number.isFinite(a.order) && Number.isFinite(b.order)) {
+      return a.order - b.order;
+    }
+    if (Number.isFinite(a.order)) return -1;
+    if (Number.isFinite(b.order)) return 1;
+    return (b.date || "").localeCompare(a.date || "");
+  });
 
   for (const a of albums) {
     const b = document.createElement("button");
     b.className = "album-tile";
+    b.dataset.id = a.id;
 
     const cover = document.createElement("div");
     cover.className = "album-icon";
@@ -719,13 +725,6 @@ async function renderAlbums() {
       const img = document.createElement("img");
       img.src = fileUrl(firstPhoto.blob);
       img.alt = "Albüm kapağı";
-      img.style.cssText = `
-        width:100%;
-        height:125px;
-        object-fit:cover;
-        border-radius:10px;
-        display:block;
-      `;
       cover.append(img);
     } else {
       cover.textContent = "♡";
@@ -738,11 +737,100 @@ async function renderAlbums() {
     date.textContent = a.date || "";
 
     b.append(cover, title, date);
-    b.onclick = () => openAlbum(a.id);
+
+    b.addEventListener("click", () => {
+      if (dragJustFinished) return;
+      openAlbum(a.id);
+    });
+
+    addAlbumDrag(b, box);
 
     box.append(b);
   }
 }
+
+let dragJustFinished = false;
+
+function addAlbumDrag(tile, box) {
+  let timer = null;
+  let dragging = false;
+  let startX = 0;
+  let startY = 0;
+
+  tile.addEventListener("pointerdown", e => {
+    if (e.button !== 0 && e.pointerType === "mouse") return;
+
+    startX = e.clientX;
+    startY = e.clientY;
+    dragging = false;
+
+    timer = setTimeout(() => {
+      dragging = true;
+      tile.classList.add("dragging");
+      tile.setPointerCapture(e.pointerId);
+    }, 300);
+  });
+
+  tile.addEventListener("pointermove", e => {
+    if (!dragging) {
+      if (
+        Math.abs(e.clientX - startX) > 10 ||
+        Math.abs(e.clientY - startY) > 10
+      ) {
+        clearTimeout(timer);
+      }
+      return;
+    }
+
+    e.preventDefault();
+
+    const target = document.elementFromPoint(
+      e.clientX,
+      e.clientY
+    )?.closest(".album-tile");
+
+    if (!target || target === tile || target.parentElement !== box) {
+      return;
+    }
+
+    const r = target.getBoundingClientRect();
+    const after =
+      e.clientY > r.top + r.height / 2;
+
+    box.insertBefore(
+      tile,
+      after ? target.nextSibling : target
+    );
+  });
+
+  const finish = async () => {
+    clearTimeout(timer);
+
+    if (!dragging) return;
+
+    dragging = false;
+    tile.classList.remove("dragging");
+    dragJustFinished = true;
+
+    const ids = [...box.querySelectorAll(".album-tile")]
+      .map(el => el.dataset.id);
+
+    for (let i = 0; i < ids.length; i++) {
+      const album = await getAlbum(ids[i]);
+      if (album) {
+        album.order = i;
+        await saveAlbum(album);
+      }
+    }
+
+    setTimeout(() => {
+      dragJustFinished = false;
+    }, 250);
+  };
+
+  tile.addEventListener("pointerup", finish);
+  tile.addEventListener("pointercancel", finish);
+    }
 
 
 function revokeUrls(){
