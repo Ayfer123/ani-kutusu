@@ -381,7 +381,7 @@ header {
   box-shadow: 0 12px 30px #0004;
 }
   /* Albüm sürükleme */
-#albumList .album-tile {
+#albumList.reorder-mode .album-tile {
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
@@ -429,7 +429,11 @@ header {
     <span class="star star-3">⋆</span>
   </div>
 
-  <div class="board-heading">☾ MY MEMORY BOARD</div>
+  <div class="row between" style="position:relative;z-index:3;margin:0 8px 8px">
+    <div class="board-heading">☾ MY MEMORY BOARD</div>
+    <button id="reorderButton" class="btn" type="button" onclick="toggleReorderMode()">↕ Taşı</button>
+  </div>
+  <p id="reorderHint" class="muted" style="display:none;position:relative;z-index:3;margin:0 8px 8px;font-size:12px">Albümü basılı tutup sürükleyerek yerini değiştir. Bitince “Sıralamayı bitir”e bas.</p>
 
   <div id="albumList" class="album-grid"></div>
 
@@ -676,168 +680,131 @@ function newAlbum(){
 async function createAlbum(){
   const title=$("albumTitle").value.trim();
   if(!title)return alert("Önce albüm adı yaz.");
-  const existingAlbums = await allAlbums();
-  const nextOrder = existingAlbums.length;
-  const a = {
-  id: uid(),
-  title,
-  date: $("albumDate").value,
-  order: nextOrder,
-  theme: "pink",
-  media: [],
-  design: defaultDesign()
-};
-    
-  
-
-async function renderAlbums() {
-  const albums = await allAlbums();
-  const box = $("albumList");
-
-  box.replaceChildren();
-  revokeUrls();
-
-  if (!albums.length) {
-    const p = document.createElement("p");
-    p.className = "muted";
-    p.textContent = "Henüz albümün yok ♡";
-    box.append(p);
-    return;
-  }
-
-  albums.sort((a, b) => {
-    if (Number.isFinite(a.order) && Number.isFinite(b.order)) {
-      return a.order - b.order;
-    }
-    if (Number.isFinite(a.order)) return -1;
-    if (Number.isFinite(b.order)) return 1;
-    return (b.date || "").localeCompare(a.date || "");
-  });
-
-  for (const a of albums) {
-    const b = document.createElement("button");
-    b.className = "album-tile";
-    b.dataset.id = a.id;
-
-    const cover = document.createElement("div");
-    cover.className = "album-icon";
-
-    const firstPhoto = (a.media || []).find(
-      m => m.type?.startsWith("image/") &&
-           m.blob instanceof Blob
-    );
-
-    if (firstPhoto) {
-      const img = document.createElement("img");
-      img.src = fileUrl(firstPhoto.blob);
-      img.alt = "Albüm kapağı";
-      cover.append(img);
-    } else {
-      cover.textContent = "♡";
-    }
-
-    const title = document.createElement("strong");
-    title.textContent = a.title;
-
-    const date = document.createElement("small");
-    date.textContent = a.date || "";
-
-    b.append(cover, title, date);
-
-    b.addEventListener("click", () => {
-      if (dragJustFinished) return;
-      openAlbum(a.id);
-    });
-
-    addAlbumDrag(b, box);
-
-    box.append(b);
+  try{
+    const existingAlbums=await allAlbums();
+    const nextOrder=existingAlbums.reduce((max,a)=>Math.max(max,Number(a.order)||0),-1)+1;
+    const a={
+      id:uid(),
+      title,
+      date:$("albumDate").value,
+      order:nextOrder,
+      theme:"pink",
+      media:[],
+      design:defaultDesign()
+    };
+    await saveAlbum(a);
+    currentAlbumId=a.id;
+    currentAlbum=a;
+    show("home");
+    alert("Albüm oluşturuldu ♡");
+  }catch(e){
+    console.error(e);
+    alert("Albüm oluşturulamadı: "+e.message);
   }
 }
 
-let dragJustFinished = false;
+let reorderMode=false;
+let dragJustFinished=false;
 
-function addAlbumDrag(tile, box) {
-  let timer = null;
-  let dragging = false;
-  let startX = 0;
-  let startY = 0;
+function toggleReorderMode(){
+  reorderMode=!reorderMode;
+  const box=$("albumList");
+  const button=$("reorderButton");
+  const hint=$("reorderHint");
+  box.classList.toggle("reorder-mode",reorderMode);
+  button.classList.toggle("active",reorderMode);
+  button.textContent=reorderMode?"✓ Sıralamayı bitir":"↕ Taşı";
+  hint.style.display=reorderMode?"block":"none";
+  if(!reorderMode)saveAlbumOrder();
+}
 
-  tile.addEventListener("pointerdown", e => {
-    if (e.button !== 0 && e.pointerType === "mouse") return;
+async function saveAlbumOrder(){
+  const ids=[...$("albumList").querySelectorAll(".album-tile")].map(el=>el.dataset.id);
+  for(let i=0;i<ids.length;i++){
+    const album=await getAlbum(ids[i]);
+    if(album){album.order=i;await saveAlbum(album);}
+  }
+}
 
-    startX = e.clientX;
-    startY = e.clientY;
-    dragging = false;
-
-    timer = setTimeout(() => {
-      dragging = true;
-      tile.classList.add("dragging");
-      tile.setPointerCapture(e.pointerId);
-    }, 300);
+async function renderAlbums(){
+  const albums=await allAlbums();
+  const box=$("albumList");
+  box.replaceChildren();
+  revokeUrls();
+  if(!albums.length){
+    const p=document.createElement("p");
+    p.className="muted";
+    p.textContent="Henüz albümün yok ♡";
+    box.append(p);
+    return;
+  }
+  albums.sort((a,b)=>{
+    const ao=Number.isFinite(Number(a.order))?Number(a.order):Number.MAX_SAFE_INTEGER;
+    const bo=Number.isFinite(Number(b.order))?Number(b.order):Number.MAX_SAFE_INTEGER;
+    return ao-bo||(b.date||"").localeCompare(a.date||"");
   });
+  for(const a of albums){
+    const tile=document.createElement("button");
+    tile.type="button";
+    tile.className="album-tile";
+    tile.dataset.id=a.id;
+    const cover=document.createElement("div");
+    cover.className="album-icon";
+    const firstPhoto=(a.media||[]).find(m=>m.type?.startsWith("image/")&&m.blob instanceof Blob);
+    if(firstPhoto){
+      const img=document.createElement("img");
+      img.src=fileUrl(firstPhoto.blob);
+      img.alt="Albüm kapağı";
+      cover.append(img);
+    }else cover.textContent="♡";
+    const title=document.createElement("strong");
+    title.textContent=a.title;
+    const date=document.createElement("small");
+    date.textContent=a.date||"";
+    tile.append(cover,title,date);
+    tile.addEventListener("click",()=>{
+      if(reorderMode||dragJustFinished)return;
+      openAlbum(a.id);
+    });
+    addAlbumDrag(tile,box);
+    box.append(tile);
+  }
+  box.classList.toggle("reorder-mode",reorderMode);
+}
 
-  tile.addEventListener("pointermove", e => {
-    if (!dragging) {
-      if (
-        Math.abs(e.clientX - startX) > 10 ||
-        Math.abs(e.clientY - startY) > 10
-      ) {
-        clearTimeout(timer);
-      }
-      return;
-    }
-
+function addAlbumDrag(tile,box){
+  let dragging=false;
+  let pointerId=null;
+  tile.addEventListener("pointerdown",e=>{
+    if(!reorderMode)return;
+    if(e.pointerType==="mouse"&&e.button!==0)return;
     e.preventDefault();
-
-    const target = document.elementFromPoint(
-      e.clientX,
-      e.clientY
-    )?.closest(".album-tile");
-
-    if (!target || target === tile || target.parentElement !== box) {
-      return;
-    }
-
-    const r = target.getBoundingClientRect();
-    const after =
-      e.clientY > r.top + r.height / 2;
-
-    box.insertBefore(
-      tile,
-      after ? target.nextSibling : target
-    );
+    dragging=true;
+    pointerId=e.pointerId;
+    tile.classList.add("dragging");
+    tile.setPointerCapture(pointerId);
   });
-
-  const finish = async () => {
-    clearTimeout(timer);
-
-    if (!dragging) return;
-
-    dragging = false;
+  tile.addEventListener("pointermove",e=>{
+    if(!dragging||!reorderMode)return;
+    e.preventDefault();
+    const target=document.elementFromPoint(e.clientX,e.clientY)?.closest(".album-tile");
+    if(!target||target===tile||target.parentElement!==box)return;
+    const r=target.getBoundingClientRect();
+    const before=(e.clientY<r.top+r.height/2)||
+      (Math.abs(e.clientY-(r.top+r.height/2))<r.height/2&&e.clientX<r.left+r.width/2);
+    box.insertBefore(tile,before?target:target.nextSibling);
+  });
+  const finish=async()=>{
+    if(!dragging)return;
+    dragging=false;
     tile.classList.remove("dragging");
-    dragJustFinished = true;
-
-    const ids = [...box.querySelectorAll(".album-tile")]
-      .map(el => el.dataset.id);
-
-    for (let i = 0; i < ids.length; i++) {
-      const album = await getAlbum(ids[i]);
-      if (album) {
-        album.order = i;
-        await saveAlbum(album);
-      }
-    }
-
-    setTimeout(() => {
-      dragJustFinished = false;
-    }, 250);
+    dragJustFinished=true;
+    await saveAlbumOrder();
+    setTimeout(()=>{dragJustFinished=false;},300);
   };
-
-  tile.addEventListener("pointerup", finish);
-  tile.addEventListener("pointercancel", finish);
-    }
-
+  tile.addEventListener("pointerup",finish);
+  tile.addEventListener("pointercancel",finish);
+}
 
 function revokeUrls(){
   objectUrls.forEach(URL.revokeObjectURL);
