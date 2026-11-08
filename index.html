@@ -394,6 +394,12 @@ header {
   z-index: 10;
   box-shadow: 0 12px 25px #0007;
 }
+
+/* Akici album surukleme gorunumu */
+.album-drag-ghost{position:fixed!important;z-index:99999!important;pointer-events:none!important;opacity:.96!important;transform:scale(1.04)!important;box-shadow:0 16px 36px #0008!important;margin:0!important}
+.album-placeholder{box-sizing:border-box;border:2px dashed #d79bab;border-radius:16px;background:#d79bab22;min-height:110px}
+#albumList .drag-source{opacity:.15!important}
+
 </style>
 </head>
 <body>
@@ -774,33 +780,84 @@ async function renderAlbums(){
 
 function addAlbumDrag(tile,box){
   let dragging=false;
-  let pointerId=null;
+  let startX=0;
+  let startY=0;
+  let ghost=null;
+  let placeholder=null;
+  let offsetX=0;
+  let offsetY=0;
+  let activePointer=null;
+
   tile.addEventListener("pointerdown",e=>{
     if(!reorderMode)return;
     if(e.pointerType==="mouse"&&e.button!==0)return;
     e.preventDefault();
+    activePointer=e.pointerId;
+    startX=e.clientX;
+    startY=e.clientY;
+    const rect=tile.getBoundingClientRect();
+    offsetX=e.clientX-rect.left;
+    offsetY=e.clientY-rect.top;
+    placeholder=document.createElement("div");
+    placeholder.className="album-placeholder";
+    placeholder.style.width=rect.width+"px";
+    placeholder.style.height=rect.height+"px";
+    tile.parentNode.insertBefore(placeholder,tile);
+    ghost=tile.cloneNode(true);
+    ghost.classList.remove("dragging");
+    ghost.classList.add("album-drag-ghost");
+    ghost.style.width=rect.width+"px";
+    ghost.style.height=rect.height+"px";
+    ghost.style.left=rect.left+"px";
+    ghost.style.top=rect.top+"px";
+    document.body.appendChild(ghost);
+    tile.classList.add("drag-source");
     dragging=true;
-    pointerId=e.pointerId;
-    tile.classList.add("dragging");
-    tile.setPointerCapture(pointerId);
+    tile.setPointerCapture(activePointer);
   });
+
   tile.addEventListener("pointermove",e=>{
-    if(!dragging||!reorderMode)return;
+    if(!dragging||e.pointerId!==activePointer)return;
     e.preventDefault();
-    const target=document.elementFromPoint(e.clientX,e.clientY)?.closest(".album-tile");
-    if(!target||target===tile||target.parentElement!==box)return;
-    const r=target.getBoundingClientRect();
-    const before=(e.clientY<r.top+r.height/2)||
-      (Math.abs(e.clientY-(r.top+r.height/2))<r.height/2&&e.clientX<r.left+r.width/2);
-    box.insertBefore(tile,before?target:target.nextSibling);
+    ghost.style.left=(e.clientX-offsetX)+"px";
+    ghost.style.top=(e.clientY-offsetY)+"px";
+    const candidates=[...box.querySelectorAll(".album-tile")].filter(el=>el!==tile);
+    let inserted=false;
+    for(const target of candidates){
+      const r=target.getBoundingClientRect();
+      const midpointY=r.top+r.height/2;
+      const midpointX=r.left+r.width/2;
+      const afterRow=e.clientY>midpointY && e.clientY<r.bottom;
+      const before= e.clientY<midpointY || (Math.abs(e.clientY-midpointY)<r.height/2 && e.clientX<midpointX);
+      if(before){
+        box.insertBefore(placeholder,target);
+        inserted=true;
+        break;
+      }
+      if(afterRow){
+        box.insertBefore(placeholder,target.nextSibling);
+        inserted=true;
+        break;
+      }
+    }
+    if(!inserted)box.appendChild(placeholder);
   });
-  const finish=async()=>{
-    if(!dragging)return;
+
+  const finish=async e=>{
+    if(!dragging|| (e && e.pointerId!==activePointer))return;
     dragging=false;
-    tile.classList.remove("dragging");
+    if(placeholder&&placeholder.parentNode){
+      placeholder.parentNode.insertBefore(tile,placeholder);
+      placeholder.remove();
+    }
+    if(ghost)ghost.remove();
+    ghost=null;
+    placeholder=null;
+    tile.classList.remove("drag-source");
+    activePointer=null;
     dragJustFinished=true;
     await saveAlbumOrder();
-    setTimeout(()=>{dragJustFinished=false;},300);
+    setTimeout(()=>{dragJustFinished=false;},350);
   };
   tile.addEventListener("pointerup",finish);
   tile.addEventListener("pointercancel",finish);
