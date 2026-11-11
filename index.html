@@ -400,6 +400,38 @@ header {
 .album-placeholder{box-sizing:border-box;border:2px dashed #d79bab;border-radius:16px;background:#d79bab22;min-height:110px}
 #albumList .drag-source{opacity:.15!important}
 
+
+/* MOBİL SAYFA KAYDIRMA */
+html {
+  min-height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+main {
+  padding-bottom: calc(40px + env(safe-area-inset-bottom));
+}
+#home,
+#albumScreen,
+#createScreen,
+#studioScreen,
+#qrScreen,
+#selectionScreen {
+  touch-action: pan-y;
+}
+.memory-board {
+  overflow: visible;
+}
+.memory-board .board-decor {
+  border-radius: inherit;
+}
+
 </style>
 </head>
 <body>
