@@ -382,7 +382,7 @@ header {
 }
   /* Albüm sürükleme */
 #albumList.reorder-mode .album-tile {
-  touch-action: none;
+  touch-action: none !important;
   user-select: none;
   -webkit-user-select: none;
   cursor: grab;
@@ -397,40 +397,8 @@ header {
 
 /* Akici album surukleme gorunumu */
 .album-drag-ghost{position:fixed!important;z-index:99999!important;pointer-events:none!important;opacity:.96!important;transform:scale(1.04)!important;box-shadow:0 16px 36px #0008!important;margin:0!important}
-.album-placeholder{box-sizing:border-box;border:2px dashed #d79bab;border-radius:16px;background:#d79bab22;min-height:110px}
+.album-placeholder{box-sizing:border-box;border:2px dashed #d79bab;border-radius:4px;background:#d79bab33;min-height:110px;align-self:stretch;transform:none!important}
 #albumList .drag-source{opacity:.15!important}
-
-
-/* MOBİL SAYFA KAYDIRMA */
-html {
-  min-height: 100%;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-body {
-  min-height: 100vh;
-  overflow-x: hidden;
-  overflow-y: auto;
-  touch-action: pan-y;
-  -webkit-overflow-scrolling: touch;
-}
-main {
-  padding-bottom: calc(40px + env(safe-area-inset-bottom));
-}
-#home,
-#albumScreen,
-#createScreen,
-#studioScreen,
-#qrScreen,
-#selectionScreen {
-  touch-action: pan-y;
-}
-.memory-board {
-  overflow: visible;
-}
-.memory-board .board-decor {
-  border-radius: inherit;
-}
 
 </style>
 </head>
@@ -812,87 +780,111 @@ async function renderAlbums(){
 
 function addAlbumDrag(tile,box){
   let dragging=false;
-  let startX=0;
-  let startY=0;
   let ghost=null;
   let placeholder=null;
   let offsetX=0;
   let offsetY=0;
   let activePointer=null;
+  let startX=0;
+  let startY=0;
 
-  tile.addEventListener("pointerdown",e=>{
-    if(!reorderMode)return;
-    if(e.pointerType==="mouse"&&e.button!==0)return;
-    e.preventDefault();
-    activePointer=e.pointerId;
-    startX=e.clientX;
-    startY=e.clientY;
-    const rect=tile.getBoundingClientRect();
-    offsetX=e.clientX-rect.left;
-    offsetY=e.clientY-rect.top;
-    placeholder=document.createElement("div");
-    placeholder.className="album-placeholder";
-    placeholder.style.width=rect.width+"px";
-    placeholder.style.height=rect.height+"px";
-    tile.parentNode.insertBefore(placeholder,tile);
-    ghost=tile.cloneNode(true);
-    ghost.classList.remove("dragging");
-    ghost.classList.add("album-drag-ghost");
-    ghost.style.width=rect.width+"px";
-    ghost.style.height=rect.height+"px";
-    ghost.style.left=rect.left+"px";
-    ghost.style.top=rect.top+"px";
-    document.body.appendChild(ghost);
-    tile.classList.add("drag-source");
-    dragging=true;
-    tile.setPointerCapture(activePointer);
-  });
-
-  tile.addEventListener("pointermove",e=>{
-    if(!dragging||e.pointerId!==activePointer)return;
+  const move=e=>{
+    if(!dragging || e.pointerId!==activePointer)return;
     e.preventDefault();
     ghost.style.left=(e.clientX-offsetX)+"px";
     ghost.style.top=(e.clientY-offsetY)+"px";
-    const candidates=[...box.querySelectorAll(".album-tile")].filter(el=>el!==tile);
-    let inserted=false;
-    for(const target of candidates){
-      const r=target.getBoundingClientRect();
-      const midpointY=r.top+r.height/2;
-      const midpointX=r.left+r.width/2;
-      const afterRow=e.clientY>midpointY && e.clientY<r.bottom;
-      const before= e.clientY<midpointY || (Math.abs(e.clientY-midpointY)<r.height/2 && e.clientX<midpointX);
-      if(before){
-        box.insertBefore(placeholder,target);
-        inserted=true;
-        break;
-      }
-      if(afterRow){
-        box.insertBefore(placeholder,target.nextSibling);
-        inserted=true;
+
+    // Parmağın altındaki albüme göre boşluğu yeniden konumlandır.
+    const tiles=[...box.querySelectorAll('.album-tile')].filter(el=>el!==tile);
+    let target=null;
+    for(const candidate of tiles){
+      const r=candidate.getBoundingClientRect();
+      if(e.clientX>=r.left && e.clientX<=r.right && e.clientY>=r.top && e.clientY<=r.bottom){
+        target=candidate;
+        const after=e.clientY>r.top+r.height/2;
+        box.insertBefore(placeholder,after?candidate.nextSibling:candidate);
         break;
       }
     }
-    if(!inserted)box.appendChild(placeholder);
-  });
+
+    // Boşlukların arasına bırakıldığında en yakın satırdaki uygun konumu bul.
+    if(!target){
+      const remaining=[...box.querySelectorAll('.album-tile')].filter(el=>el!==tile);
+      let best=null;
+      let bestDistance=Infinity;
+      for(const candidate of remaining){
+        const r=candidate.getBoundingClientRect();
+        const cx=r.left+r.width/2, cy=r.top+r.height/2;
+        const d=Math.hypot(e.clientX-cx,e.clientY-cy);
+        if(d<bestDistance){bestDistance=d;best=candidate;}
+      }
+      if(best){
+        const r=best.getBoundingClientRect();
+        const before=(e.clientY<r.top+r.height/2) ||
+          (Math.abs(e.clientY-(r.top+r.height/2))<r.height/2 && e.clientX<r.left+r.width/2);
+        box.insertBefore(placeholder,before?best:best.nextSibling);
+      }else{
+        box.appendChild(placeholder);
+      }
+    }
+
+    // Parmağı ekranın kenarına yaklaştırınca sayfa da sürüklemeyi takip ederek kayar.
+    const edge=65;
+    if(e.clientY<edge) window.scrollBy(0,-Math.max(5,(edge-e.clientY)/5));
+    else if(e.clientY>window.innerHeight-edge) window.scrollBy(0,Math.max(5,(e.clientY-(window.innerHeight-edge))/5));
+  };
 
   const finish=async e=>{
-    if(!dragging|| (e && e.pointerId!==activePointer))return;
+    if(!dragging || (e && e.pointerId!==activePointer))return;
     dragging=false;
-    if(placeholder&&placeholder.parentNode){
+    document.removeEventListener('pointermove',move);
+    document.removeEventListener('pointerup',finish);
+    document.removeEventListener('pointercancel',finish);
+    if(placeholder && placeholder.parentNode){
       placeholder.parentNode.insertBefore(tile,placeholder);
       placeholder.remove();
     }
     if(ghost)ghost.remove();
-    ghost=null;
-    placeholder=null;
-    tile.classList.remove("drag-source");
+    ghost=null; placeholder=null;
+    tile.classList.remove('drag-source');
     activePointer=null;
     dragJustFinished=true;
     await saveAlbumOrder();
-    setTimeout(()=>{dragJustFinished=false;},350);
+    setTimeout(()=>{dragJustFinished=false;},450);
   };
-  tile.addEventListener("pointerup",finish);
-  tile.addEventListener("pointercancel",finish);
+
+  tile.addEventListener('pointerdown',e=>{
+    if(!reorderMode)return;
+    if(e.pointerType==='mouse' && e.button!==0)return;
+    e.preventDefault();
+    e.stopPropagation();
+    activePointer=e.pointerId;
+    startX=e.clientX; startY=e.clientY;
+    const rect=tile.getBoundingClientRect();
+    offsetX=e.clientX-rect.left;
+    offsetY=e.clientY-rect.top;
+
+    placeholder=document.createElement('div');
+    placeholder.className='album-placeholder';
+    placeholder.style.width=rect.width+'px';
+    placeholder.style.height=rect.height+'px';
+    box.insertBefore(placeholder,tile);
+
+    ghost=tile.cloneNode(true);
+    ghost.classList.remove('dragging','drag-source');
+    ghost.classList.add('album-drag-ghost');
+    ghost.style.width=rect.width+'px';
+    ghost.style.height=rect.height+'px';
+    ghost.style.left=rect.left+'px';
+    ghost.style.top=rect.top+'px';
+    document.body.appendChild(ghost);
+    tile.classList.add('drag-source');
+    dragging=true;
+
+    document.addEventListener('pointermove',move,{passive:false});
+    document.addEventListener('pointerup',finish);
+    document.addEventListener('pointercancel',finish);
+  },{passive:false});
 }
 
 function revokeUrls(){
